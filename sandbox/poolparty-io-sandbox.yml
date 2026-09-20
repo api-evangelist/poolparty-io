@@ -1,0 +1,56 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/api/channels/main/manifest
+docs:
+- https://www.poolparty.io/agent-quickstart
+- https://www.poolparty.io/api/agent/manifest
+- https://www.poolparty.io/api/channels/main/collateral/opportunity
+summary: >-
+  PoolParty has no separate sandbox host or test-mode keys; the production Main Stage IS the rehearsal
+  environment, running its entire economic layer on the Polygon Amoy testnet with tokens that the provider
+  labels "no cash value" on every surface. It publishes two faucets (testnet POL for gas, testnet USDC for
+  collateral), the testnet token and faucet contract addresses, a "SIM signer" for local/dev rehearsals, and
+  a set of dry-run tools (preview, simulate, quote-without-reserve) so an agent can rehearse minting,
+  pooling, withdrawal and Superblock purchase end to end without real money. Sponsor slots on Base are the
+  one real-money surface and are disabled on the Main Stage.
+test_vs_live:
+  separate_environment: false
+  test_mode_keys: 'none — one pilot-key type (ppk_ prefix); scope and channel binding, not a test/live switch'
+  economic_environments:
+  - {channel: main, mode: testnet_simulated, network: Polygon Amoy, chainId: 80002, valueStatus: testnet_no_cash_value}
+  - {surface: sponsor slots, mode: mainnet_real_value, network: Base, chainId: 8453, valueStatus: real_money, status: 'disabled on main (0 slots)'}
+  risk_notice_verbatim: 'This channel uses USDC on Polygon Amoy. Payments and rewards may involve real value where mainnet is enabled. Testnet channels use simulated funds with no cash value.'
+testnet_assets:
+  token: {symbol: USDC, displayName: Testnet USDC, address: '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582', decimals: 6, chain: 'Polygon Amoy (80002)', cashValue: none}
+  faucet_contract: '0xB86E05A456F746fB95781D9c1298e9f3Fe2C2923 (channel manifest mechanism.faucet.contract)'
+  gas_faucet:
+    tool: claim_test_pol
+    endpoint: https://www.poolparty.io/api/channels/main/test-pol/faucet
+    mode: amoy-transfer
+    verbatim: 'Default gas faucet mode sends a bounded Polygon Amoy POL transfer from the configured PoolParty testnet funder when the wallet is below the launch gas floor.'
+    auth: 'No MCP auth required (public wallet bootstrap action)'
+  collateral_faucet:
+    tool: claim_test_collateral
+    endpoint: https://www.poolparty.io/api/channels/main/test-collateral/faucet
+    modes: [amoy-prepare, mock, local-dev]
+    verbatim: 'Default faucet mode prepares a Polygon Amoy wallet transaction; it does not silently fund the wallet.'
+  sim_signer:
+    tool: get_sim_signer_access
+    verbatim: 'Read safe SIM signer availability for a local/dev PP0 economic rehearsal. Returns redacted ...'
+    companion: complete_sim_pool_back (economic:proof scope) — "one tightly gated local/dev PP0 economic pool/back proof with a configured SIM signer"
+rehearsal_flow:
+  source: https://www.poolparty.io/agent-quickstart (Step 0c — Rehearse collateralized blocks)
+  steps: [resolve_channel("PP0"), get_collateral_opportunity, claim_test_collateral, claim_test_pol (when gas is low), pool_block, 'submit the returned wallet transaction', finalize_pool_support, get_wallet_pooling_state, withdraw_pool_support (before lock), get_pooling_receipt, get_block_economics]
+dry_run_tools:
+- {tool: preview_channel_template, note: 'dry-run preview; channel creation not yet available'}
+- {tool: simulate_program_queue_publish, note: dry-run of a live-queue publish}
+- {tool: propose_program_order, note: non-mutating}
+- {tool: quote_superblock_reservation, note: 'quote without holding inventory'}
+- {tool: preview_slide_block, note: 'validate a SlideBlock package; returns a shareable previewUrl; does not submit'}
+- {tool: 'draft_slide_block_from_project(sourceProjectUrl: "agent-exchange-fixture")', note: 'built-in fixture — the one published test fixture value'}
+observed_state:
+  url: https://www.poolparty.io/api/channels/main/collateral/opportunity
+  fetched: '2026-09-19'
+  status: 200
+  note: 'At fetch time the collateral opportunity reported enabled:false with unavailableReason "ENOTFOUND" while still advertising both faucets as available — the rehearsal surface was degraded, which the manifest exposes in-band rather than by status code.'
+never_invented: No test keys, wallets, session tokens or amounts appear here beyond what the provider publishes; no faucet was called.

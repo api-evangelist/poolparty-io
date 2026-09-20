@@ -1,0 +1,1105 @@
+generated: '2026-09-19'
+method: derived
+source: mcp/poolparty-io-mcp-tools.json
+docs:
+- https://www.poolparty.io/api/agent/manifest
+- https://www.poolparty.io/agent
+- https://www.poolparty.io/AGENTS.md
+description: Recommended x-agentic-access execution contracts for PoolParty's 71 MCP tools (there is no OpenAPI,
+  so the unit is the tool, not the operation). The classification is heuristic — read-only prefixes and the provider's
+  own 'Read-only' / 'No auth required' / 'Requires ... scope' / wallet-approval sentences in each tool description,
+  plus the agent manifest's delegated_agent_policy (which lists the transactions that need a signer) and prohibited_agent_actions
+  (execute_payment_without_human_approval, spam_submissions, farm_rewards_via_repeated_submissions, attempt_admin_routes,
+  bypass_policy_limits). PoolParty does NOT publish x-agentic-access itself; this is a governance starting point
+  derived from what it does publish, and audience is left null to bind per deployment. Vocabulary and TTL ceilings
+  mirror research/curity/agentic-governance/.
+provider_published_access_guidance:
+  access_model_verbatim: 36 tools and all 14 resources require no auth or read-only resource access unless the resource
+    itself needs channel backing data / 30 base tools require scoped API keys; current deployment exposes 34 protected
+    tools when paid-action flags are included
+  human_approval_verbatim: Agents must not initiate payments, collateral, paid airtime, or reward-claim transactions
+    without explicit human wallet approval unless they are signing from their own funded wallet. PoolParty still
+    verifies receipts before finality.
+  prohibited_agent_actions:
+  - execute_payment_without_human_approval
+  - spam_submissions
+  - farm_rewards_via_repeated_submissions
+  - attempt_admin_routes
+  - bypass_policy_limits
+  delegated_agent_policy:
+    status: prepare_only
+    enabled: false
+    mode: prepare_only_agent_owned_wallet
+    currentSafeModels:
+      agentOwnedWalletDirectSigning: true
+      humanDelegatedBudget: false
+      operatorOrchestratorSponsoredExecution: false
+  execution_annotation: every tool declares execution.taskSupport "forbidden" (no long-running MCP tasks)
+summary:
+  tools: 71
+  by_action_class:
+    connected: 42
+    acting: 29
+  by_consequence:
+    read: 42
+    physical: 10
+    write: 15
+    safety-critical: 4
+  human_in_the_loop_required: 14
+operations:
+- tool: list_program_modes
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_program_mode_manifest
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: list_block_types
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_block_type_schema
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: draft_slide_block_from_project
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: preview_slide_block
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: revise_slide_block
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: list_channel_templates
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: preview_channel_template
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: resolve_channel
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_superblock_offerings
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_collateral_opportunity
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: claim_test_pol
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: claim_test_collateral
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: prepare_block_mint
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: finalize_block_mint
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: get_block_mint_status
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: pool_block
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: finalize_pool_support
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: withdraw_pool_support
+  mcp_auth: none
+  scopes: null
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: get_wallet_pooling_state
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_pooling_receipt
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_block_economics
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_sim_signer_access
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_distribution_report
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_channel_metrics
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_airtime_opportunity
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_platform_pulse
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: browse_channels
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_channel_stream
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_channel_feed
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_open_submission_calls
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_reward_opportunities
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_sponsor_opportunities
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: list_programming_scope_profiles
+  mcp_auth: pilot-key
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: request_pilot_key
+  mcp_auth: none
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: check_key_request_status
+  mcp_auth: none
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: get_key_info
+  mcp_auth: pilot-key
+  scopes: null
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: complete_sim_pool_back
+  mcp_auth: pilot-key
+  scopes:
+  - economic:proof
+  - submit:block
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: create_join_session
+  mcp_auth: pilot-key
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: attach_wallet_to_session
+  mcp_auth: pilot-key
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: request_media_upload_url
+  mcp_auth: pilot-key
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: complete_media_upload
+  mcp_auth: pilot-key
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: submit_media_block
+  mcp_auth: pilot-key
+  scopes:
+  - submit:block
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: prepare_superblock_purchase
+  mcp_auth: pilot-key
+  scopes:
+  - purchase:prepare
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: quote_superblock_reservation
+  mcp_auth: pilot-key
+  scopes:
+  - purchase:prepare
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: quote_sponsor_reservation
+  mcp_auth: pilot-key
+  scopes:
+  - purchase:prepare
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: settle_paid_action
+  mcp_auth: pilot-key
+  scopes:
+  - purchase:prepare
+  wallet_signature: true
+  x-agentic-access:
+    action-class: acting
+    consequence: physical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 300
+      exchange: required
+      purpose-required: true
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - wallet-transaction
+      provider_basis: wallet owner or agent-owned funded signer must sign; pilot keys are not wallet approval
+    audit: required
+- tool: get_paid_action_receipt
+  mcp_auth: pilot-key
+  scopes:
+  - purchase:prepare
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: create_channel_from_template
+  mcp_auth: pilot-key
+  scopes:
+  - create:channel
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: update_channel_settings
+  mcp_auth: pilot-key
+  scopes:
+  - configure:channel
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: configure_open_call
+  mcp_auth: pilot-key
+  scopes:
+  - configure:channel
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: list_programming_candidates
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: preview_programming_candidate
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: inspect_programming_discovery_inventory
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: admit_programming_candidates
+  mcp_auth: pilot-key
+  scopes:
+  - write:programming_candidates
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: list_program_queue
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: list_programming_buckets
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: list_live_queue
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: inspect_channel_programming_policy
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: create_program_item
+  mcp_auth: pilot-key
+  scopes:
+  - write:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: draft_program_queue
+  mcp_auth: pilot-key
+  scopes:
+  - write:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: set_programming_bucket
+  mcp_auth: pilot-key
+  scopes:
+  - write:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: reorder_program_queue
+  mcp_auth: pilot-key
+  scopes:
+  - write:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- tool: simulate_program_queue_publish
+  mcp_auth: pilot-key
+  scopes:
+  - read:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: publish_program_queue
+  mcp_auth: pilot-key
+  scopes:
+  - publish:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      proof-of-possession: required
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - live-broadcast-mutation
+      provider_basis: publish/live scopes are admin-reviewed; writes record an audit event
+    audit: required
+- tool: insert_live_next
+  mcp_auth: pilot-key
+  scopes:
+  - write:live_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      proof-of-possession: required
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - live-broadcast-mutation
+      provider_basis: publish/live scopes are admin-reviewed; writes record an audit event
+    audit: required
+- tool: remove_live_queue_item
+  mcp_auth: pilot-key
+  scopes:
+  - write:live_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      proof-of-possession: required
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - live-broadcast-mutation
+      provider_basis: publish/live scopes are admin-reviewed; writes record an audit event
+    audit: required
+- tool: skip_current_live_item
+  mcp_auth: pilot-key
+  scopes:
+  - skip:live_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      proof-of-possession: required
+    escalation:
+      human-in-the-loop: required
+      triggers:
+      - live-broadcast-mutation
+      provider_basis: publish/live scopes are admin-reviewed; writes record an audit event
+    audit: required
+- tool: propose_program_order
+  mcp_auth: pilot-key
+  scopes:
+  - propose:programming
+  wallet_signature: false
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: required
+    audience: null
+    token:
+      max-ttl: 3600
+    audit: none
+- tool: accept_programming_proposal
+  mcp_auth: pilot-key
+  scopes:
+  - write:program_queue
+  wallet_signature: false
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required

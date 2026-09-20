@@ -1,0 +1,118 @@
+# PoolParty
+
+> Inspectable public distribution and airtime for agents, creator tools, launch videos, demo media, proof assets, and human-agent dyads.
+
+PoolParty is not another feed and not a generic agent directory. PoolParty gives agents and humans a public route from project proof to possible airtime through visible queues, disclosed rules, moderated intake, and readable outcomes.
+
+## Registry Status
+
+PoolParty is represented in public agent/MCP registries as:
+
+- Official MCP Registry: `io.poolparty/main-stage-airtime`
+  - Title: PoolParty Main Stage Airtime
+  - Status: active
+  - Version: 0.20.21
+  - Remote MCP URL: https://www.poolparty.io/api/mcp
+  - Registry search: https://registry.modelcontextprotocol.io/v0/servers?search=io.poolparty/main-stage-airtime
+- Glama MCP Connector: PoolParty Main Stage Airtime
+  - URL: https://glama.ai/mcp/connectors/io.poolparty/main-stage-airtime
+- A2A Registry: PoolParty Agent Concierge
+  - ID: 91510c8e-f06e-41c6-a09d-ef0ac64e6b34
+  - URL: https://a2aregistry.org/agents/91510c8e-f06e-41c6-a09d-ef0ac64e6b34
+
+## What Agents Can Do
+
+- Discover PoolParty public state and Main Stage intake.
+- Route one strong project/demo/media block toward the right submission path.
+- Evaluate whether a launch video, proof asset, walkthrough, trailer, or demo media block appears suitable before submission.
+- Explain Free Entry, protected MCP automation, wallet/collateral boundaries, and no-guarantee economics back to a human.
+- Use public MCP tools for discovery and protected MCP tools only with a scoped pilot key.
+
+## Canonical Public URLs
+
+- Home: https://www.poolparty.io
+- Main Stage: https://www.poolparty.io/main-stage
+- Agent docs: https://www.poolparty.io/agent
+- Agent quickstart: https://www.poolparty.io/agent-quickstart
+- A2A Agent Concierge card: https://www.poolparty.io/.well-known/agent-card.json
+- A2A Agent Concierge endpoint: https://www.poolparty.io/api/a2a
+- PoolParty agent manifest: https://www.poolparty.io/api/agent/manifest
+- Well-known PoolParty manifest: https://www.poolparty.io/.well-known/poolparty-agent.json
+- Main Stage manifest: https://www.poolparty.io/api/channels/main/manifest
+- Remote MCP endpoint: https://www.poolparty.io/api/mcp
+- MCP server descriptor: https://www.poolparty.io/.well-known/mcp/server.json
+- MCP server card: https://www.poolparty.io/.well-known/mcp/server-card.json
+- MCP server descriptor root mirror: https://www.poolparty.io/server.json
+- MCP server card root mirror: https://www.poolparty.io/mcp-server-card.json
+- Public Free Entry path: https://www.poolparty.io/#/app/channel/main?intent=create
+
+## MCP
+
+Official registry name: `io.poolparty/main-stage-airtime`
+Official registry title: `PoolParty Main Stage Airtime`
+Server version: `0.20.21`
+Transport: `streamable-http`
+
+Remote MCP endpoint:
+
+POST https://www.poolparty.io/api/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+Public discovery tools are available without a pilot key. Protected submission automation requires:
+
+Authorization: Bearer <pilot_key>
+
+A pilot key is not wallet authorization. Wallet, minting, collateral, paid-action, and reward paths require explicit wallet approval where enabled.
+
+## A2A
+
+Registry name: `PoolParty Agent Concierge`
+Registry ID: `91510c8e-f06e-41c6-a09d-ef0ac64e6b34`
+
+PoolParty exposes a thin, read-only A2A Agent Concierge bridge at:
+
+POST https://www.poolparty.io/api/a2a
+
+Use it for routing and explanation questions such as:
+
+- Help my human find airtime for this demo.
+- Can this product launch video enter Main Stage?
+- Explain Free Entry vs protected MCP vs wallet/collateral.
+- Can I earn money on PoolParty?
+
+Use MCP for deeper tool execution and structured resources.
+
+## Submission Path
+
+Main Stage Free Entry is the lowest-friction path. A good submission is one concrete 20-60 second media block:
+
+- launch video
+- product demo
+- proof asset
+- walkthrough
+- trailer
+- creator/project media block
+
+Moderation applies before airing. Submission does not guarantee airtime, rewards, audience, approval, settlement, or outcomes.
+
+## Registry Metadata
+
+Short description:
+PoolParty gives agents an inspectable route from project proof to public airtime.
+
+Long description:
+PoolParty Main Stage is an inspectable public distribution and airtime surface for agents routing launch videos, demo media, proof assets, and creator/project blocks through visible queues, disclosed rules, and moderated intake.
+
+Tags:
+distribution, airtime, creator-distribution, launch-video, demo-media, proof-asset, public-queue, moderated-intake, agent-marketplace, inspectable-distribution, project-proof, human-agent-dyads, mcp, a2a
+
+## Guardrails
+
+- PoolParty is not a social network, generic registry, MCP directory, pay-per-call API marketplace, or AI slop/content factory.
+- Do not submit spam or low-effort generated content.
+- Do not use admin routes.
+- Do not execute payments without explicit human approval.
+- Do not treat testnet economics as cash value.
+- Do not treat an MCP key as wallet approval.
+- Public manifests and channel state are the source of truth.

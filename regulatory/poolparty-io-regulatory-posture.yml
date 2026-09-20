@@ -1,0 +1,48 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://www.poolparty.io/
+signals: {}
+summary: >-
+  No horizontal regulatory signal is published on a surface a fetch-only client can read. www.poolparty.io is
+  a hash-routed single-page app that answers HTTP 200 with the same 15,925-byte shell for every conventional
+  legal, accessibility, transparency and AI path probed below — the known soft-404 false-positive path, so each
+  200 is recorded as ABSENT. The airtime manifest references https://www.poolparty.io/terms as termsUrl, but
+  that URL also returns the shell, and the SPA bundle (assets/index-DaATXZW3.js plus 49 lazy chunks) contains
+  no Terms, Privacy, Legal or Accessibility route, so the referenced terms could not be verified as published.
+  Absence is the measurement; nothing is inferred about which regimes apply.
+probed_absent:
+- signal: accessibility_conformance
+  urls: [{url: 'https://www.poolparty.io/accessibility', status: 200, note: SPA shell}, {url: 'https://www.poolparty.io/accessibility/vpat', status: 200, note: SPA shell}]
+- signal: subprocessors
+  urls: [{url: 'https://www.poolparty.io/legal/subprocessors', status: 200, note: SPA shell}]
+- signal: incident_notification
+  urls: [{url: 'https://www.poolparty.io/legal/dpa', status: 200, note: SPA shell}]
+- signal: data_subject_request
+  urls: [{url: 'https://www.poolparty.io/privacy/requests', status: 200, note: SPA shell}, {url: 'https://www.poolparty.io/privacy', status: 200, note: SPA shell}]
+- signal: transparency_report
+  urls: [{url: 'https://www.poolparty.io/transparency', status: 200, note: SPA shell}]
+- signal: sbom
+  urls: [{url: 'https://www.poolparty.io/security/sbom', status: 200, note: SPA shell}]
+  note: Never derived — search only.
+- signal: data_residency
+  urls: [{url: 'https://www.poolparty.io/docs/data-residency', status: 200, note: SPA shell}]
+- signal: ai_transparency
+  urls: [{url: 'https://www.poolparty.io/ai', status: 200, note: SPA shell}, {url: 'https://www.poolparty.io/ai/transparency', status: 200, note: SPA shell}]
+  note: >-
+    The provider's guardrails ("does not generate or promote low-effort AI slop", "Do not submit spam or low-effort
+    generated content") are a content policy for submitters, not an AI-interaction or AI-content disclosure about
+    PoolParty's own systems, so they do not satisfy the signal.
+- signal: notice_and_action
+  urls: [{url: 'https://www.poolparty.io/legal/report-content', status: 200, note: SPA shell}]
+  note: 'Operator moderation ("canApprove/canReject/canBan") is described in the channel manifest, but no public reporting channel for third parties is published.'
+- signal: support_lifetime
+  urls: [{url: 'https://www.poolparty.io/changelog', status: 200, note: SPA shell}]
+- signal: global_privacy_control
+  urls: [{url: 'https://www.poolparty.io/privacy', status: 200, note: SPA shell}]
+  note: honored is never set from a header probe; no statement was found.
+- signal: terms_reference
+  urls: [{url: 'https://www.poolparty.io/terms', status: 200, note: 'SPA shell — referenced as termsUrl by the airtime manifest and paidActions; content unverifiable without executing the app'}]
+control:
+  negative_path: {url: 'https://www.poolparty.io/.well-known/apievangelist-negative-control-7f3a9c', status: 200, bytes: 15925, note: 'A path that cannot exist returns the identical shell, proving the catch-all.'}
+  real_pages_for_comparison: [{url: 'https://www.poolparty.io/agent', bytes: 20041}, {url: 'https://www.poolparty.io/behind', bytes: 18806}, {url: 'https://www.poolparty.io/main-stage', bytes: 22428}]

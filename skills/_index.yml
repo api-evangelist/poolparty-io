@@ -1,0 +1,26 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/AGENTS.md
+note: >-
+  PoolParty PUBLISHES its own agent operating guide at /AGENTS.md (HTTP 200, text/markdown, 5,605 bytes;
+  listed in the provider's robots.txt Allow list and sitemap.xml, and named by the agent card's
+  poolparty.agentsMd key, by llms.txt and by the MCP server card). It is saved verbatim below; API Evangelist
+  did not author it. No skill was generated on the provider's behalf: PoolParty publishes no OpenAPI to ground
+  operationIds in, and the pipeline does not invent operations. The provider's MCP server also ships four
+  server-side prompts (find_airtime_opportunity, submit_one_media_block, verify_airing_outcome,
+  request_pilot_key — mcp/poolparty-io-mcp-prompts.json) that play the same role for MCP clients.
+skills:
+- file: poolparty-io-agents.md
+  name: PoolParty Agent Guide
+  description: >-
+    Provider-published AGENTS.md — registry identity, a five-step quickstart (agent manifest, Main Stage
+    manifest, A2A card, MCP connect, Free Entry), the Observe/Decide/Read/Act/Verify discovery ladder, safe
+    prompts, canonical links and caveats.
+  api: null
+  operations: []
+  mcp_tools_named: [get_channel_stream, request_pilot_key, get_key_info]
+  published_by: provider
+  source_url: https://www.poolparty.io/AGENTS.md
+  mirror: https://github.com/atomburn/poolparty-agent-starter/blob/main/AGENTS.md
+  advertised_by: [a2a/poolparty-io-agent-card.json (poolparty.agentsMd), llms/poolparty-io-llms.txt, robots.txt, sitemap.xml]
+  x-evidence: {fetched: '2026-09-19', http_status: 200, content_type: 'text/markdown; charset=utf-8', bytes: 5605}

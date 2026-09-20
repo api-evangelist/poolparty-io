@@ -1,0 +1,43 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/api/mcp (tools/list descriptions)
+docs:
+- https://www.poolparty.io/agent
+- https://www.poolparty.io/api/agent/manifest
+limit_count: 2
+summary: >-
+  PoolParty publishes two concrete limits, both inside MCP tool descriptions, and otherwise states that
+  protected tools are "rate-limited per key" with a per-key "rate-limit tier" readable through get_key_info.
+  No rate-limit response headers are documented anywhere, no exhaustion status code is published, and the
+  REST manifest routes carry only cache TTLs. The provider's pilot guidance is advisory throttling by
+  design: "Submit one high-quality block. Do not farm rewards." with enforcement described as
+  "advisory_and_rate_limited".
+rate_limits:
+- name: Channel creation per key
+  scope: per-key
+  limit: 3
+  window: 1 hour
+  metric: create_channel_from_template calls
+  applies_to: [create_channel_from_template]
+  source: 'mcp/poolparty-io-mcp-tools.json#create_channel_from_template — "Rate-limited: 3 per hour per key."'
+- name: Anonymous submissions per join session
+  scope: per-session
+  limit: 3
+  window: session lifetime
+  metric: submissions
+  applies_to: [create_join_session, submit_media_block]
+  source: 'mcp/poolparty-io-mcp-tools.json#create_join_session — "Session allows up to 3 anonymous submissions."'
+qualitative_limits:
+- {tool: submit_media_block, verbatim: 'Rate-limited per key. Pilot guidance: submit one high-quality block. Do not farm rewards.'}
+- {tool: get_key_info, verbatim: 'Returns redacted key id/fingerprint, scopes, allowed channel aliases, expiry, rate-limit tier, and next actions.', note: 'The tier exists but its numbers are not published.'}
+- {tool: claim_test_pol / claim_test_collateral, verbatim: 'bounded ... testnet POL transfer ... when the wallet is below the launch gas floor', note: 'A faucet floor, amount unpublished; agentSessionId is "for rate-limit identity and audit context".'}
+- {surface: 'channel manifest opportunities.communitySubmission.rewardPolicy', verbatim: 'maxRecommendedPilotSubmissions: 1 ... enforcement: advisory_and_rate_limited'}
+- {surface: 'agent manifest guardrails', verbatim: 'Repeated reward farming is discouraged and rate-limited.'}
+time_limits:
+- {name: Paid-action reservation TTL, limit: 15 minutes, source: 'mcp/poolparty-io-mcp-tools.json#prepare_superblock_purchase — "Reservations expire in 15 minutes."'}
+- {name: Superblock inventory refresh, limit: every 300 seconds, source: 'airtime manifest constraints.refreshCadenceSeconds'}
+- {name: get_channel_stream limit parameter, limit: '1-25 (default 10)', source: 'mcp/poolparty-io-mcp-tools.json#get_channel_stream'}
+headers: []
+exhaustion:
+  status: null
+  note: Not published. No 429, Retry-After or RateLimit-* behaviour is documented on any surface, and no unauthenticated probe in this pass reached a limit.

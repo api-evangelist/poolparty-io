@@ -1,0 +1,68 @@
+generated: '2026-09-19'
+method: derived
+source: live unauthenticated probes of www.poolparty.io, 2026-09-19
+probed: true
+docs: https://www.poolparty.io/api/agent/manifest
+derived_from:
+- mcp/poolparty-io-mcp-tools.json
+- well-known/poolparty-io-poolparty-agent.json
+format: json-error-object
+envelope:
+  rest:
+    media_type: application/json
+    fields:
+    - {name: error, description: 'Human-readable message ("Method not allowed. Use POST.")'}
+    - {name: code, description: 'UPPER_SNAKE machine code (METHOD_NOT_ALLOWED); not present on every route'}
+  jsonrpc:
+    media_type: application/json
+    fields:
+    - {name: error.code, description: JSON-RPC 2.0 integer code}
+    - {name: error.message, description: JSON-RPC message}
+    - {name: error.data, description: 'provider extension — on A2A carries supported_methods[]'}
+  observed:
+  - {status: 404, content_type: text/plain, body: 'The page could not be found\n\nNOT_FOUND\n\niad1::...', url: 'https://www.poolparty.io/openapi.json', note: 'The Vercel platform 404 (79 bytes), returned for any .json path or /api/* path that does not exist. Not a provider envelope.'}
+  - {status: 200, content_type: text/html, body: '15,925-byte SPA shell', url: 'https://www.poolparty.io/.well-known/security.txt', note: 'Soft-404: every extensionless or .txt path that does not exist returns the app shell with 200.'}
+  - {status: 405, body: '{"error":"Method not allowed. Use POST.","code":"METHOD_NOT_ALLOWED"}', url: 'GET https://www.poolparty.io/api/channels/main/agent-notifications/subscriptions'}
+  - {status: 405, body: '{"error":"Use POST."}', url: 'GET https://www.poolparty.io/api/channels/main/events'}
+  - {status: 405, body: '{"error":"Method not allowed"}', url: 'GET https://www.poolparty.io/api/paid-actions/superblocks/quote'}
+  - {status: 405, body: '{"error":"This is a PoolParty MCP server endpoint. Use POST with MCP protocol messages.","hint":...,"expectedHeaders":...,"authHandoff":...,"docs":...,"surface":...}', url: 'GET https://www.poolparty.io/api/mcp', note: 'A 3,233-byte self-documenting error — the most useful 405 in the catalog.'}
+  - {status: 200, body: '{"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"Method not found","data":{"supported_methods":["message/send","tasks/send","route_project_to_airtime","explain_poolparty_submission_path","evaluate_media_block_fit","explain_poolparty_economics"]}}}', url: 'POST https://www.poolparty.io/api/a2a tasks/get'}
+  - {status: 200, body: '{"action":"get_collateral_opportunity","channelSlug":"main",...,"enabled":false,"unavailableReason":"ENOTFOUND",...}', url: 'GET https://www.poolparty.io/api/channels/main/collateral/opportunity', note: 'A 200 carrying an in-band failure (an upstream DNS error surfaced as unavailableReason) — agents must read enabled/unavailableReason, not the status code.'}
+  note: >-
+    Not RFC 9457. No type URI, title/status/instance fields or public error-code registry. The MCP tool layer
+    documents its own domain error codes in prose (below); the provider's guidance is that readbacks
+    (mintStatus, poolEligibility, nextAction, agentStatusReadback) carry the actionable state.
+problem_types:
+- status: 405
+  code: METHOD_NOT_ALLOWED
+  title: Method not allowed
+  source_operations: ['GET /api/channels/{slug}/agent-notifications/subscriptions', 'GET /api/channels/{slug}/events', 'GET /api/paid-actions/superblocks/quote', 'GET /api/mcp']
+  remediation: These routes are POST-only; the /api/mcp body spells out the required Content-Type and Accept headers and the bearer handoff.
+- status: 404
+  code: NOT_FOUND
+  title: Page could not be found (platform 404)
+  source_operations: [any unknown .json or /api/* path]
+  remediation: 'Do not treat a 200 as proof of existence on this host — extensionless paths fall through to the SPA shell; confirm content_type is application/json.'
+- code: CHANNEL_NOT_ALLOWED
+  title: Pilot key not permitted on the requested channel
+  layer: MCP tool error (protected tools)
+  source_operations: [any protected tool given a channel outside the key's allowed list]
+  verbatim: '"CHANNEL_NOT_ALLOWED includes the requested alias, canonical slug, aliases, and allowed channel list. Call get_key_info before retrying protected tools." (agent manifest channel_resolution.channel_not_allowed_hint)'
+  remediation: Call resolve_channel to get the canonical slug, then get_key_info to read allowed channel aliases; request a key for the right channel via request_pilot_key.
+- code: -32601
+  title: Method not found (JSON-RPC)
+  layer: A2A / MCP JSON-RPC
+  source_operations: ['POST /api/a2a tasks/get', 'POST /api/a2a agent/getAuthenticatedExtendedCard']
+  remediation: Use one of data.supported_methods (message/send, tasks/send, or a skill id).
+- title: Eligibility rejections on pooling
+  layer: MCP tool error (pool_block / withdraw_pool_support)
+  verbatim: '"Operator/program/Youtube media, Superblocks, terminal states, creator self-pooling, Post phase, missing Amoy on-chain ids, insufficient collateral, pending duplicate pool or withdrawal intents, and blocks already locked in Whirlpool or airing are rejected." (agent quickstart)'
+  remediation: Read get_collateral_opportunity and get_wallet_pooling_state first; only active user BLOCK entries before lock are eligible.
+- title: Settlement rejections on paid actions
+  layer: MCP tool error (settle_paid_action)
+  verbatim: '"Facilitator token transfers and plain treasury transfers are rejected for production settlement." "A plain treasury or ERC-20 transfer is not a production SuperBlock purchase receipt."'
+  remediation: Settle only with the direct router transaction (SuperblockPurchaseRouter.purchase / SponsorPaymentRouter.paySponsorBlock) named in the prepared intent.
+- title: In-band unavailable states
+  layer: manifests and readbacks
+  fields: [enabled, unavailableReason, status, phase_gated, intake.status]
+  remediation: 'The provider states "The manifest and activity snapshot are the source of truth" — treat enabled:false, intake.status closed, or an unavailableReason as a stop signal regardless of HTTP status.'

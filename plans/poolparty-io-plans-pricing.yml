@@ -1,0 +1,93 @@
+generated: '2026-09-19'
+method: probed
+source: https://www.poolparty.io/api/channels/main/airtime
+docs:
+- https://www.poolparty.io/main-stage
+- https://www.poolparty.io/api/channels/main/manifest
+- https://www.poolparty.io/api/channels/pp1/airtime
+plan_count: 5
+currency: USDC
+model: >-
+  No subscription and no pricing page. PoolParty publishes a machine-readable airtime ladder per channel:
+  Free Entry (free, moderated), a reversible-collateral tier (testnet USDC "signal", not a payment), and
+  fixed-price Superblock reservations paid in USDC through an "x402-compatible" HTTP 402 envelope settled by a
+  direct router transaction. On the Main Stage (channel "main") every priced item runs on Polygon Amoy TESTNET
+  with valueStatus testnet_no_cash_value; sponsor slots are defined on Base mainnet as real money but are
+  disabled (0 slots) on this channel. Prices below are as served on 2026-09-19 (the manifest refreshes its
+  inventory every 300 s) and the provider's own risk notice applies: "Payments and rewards may involve real
+  value where mainnet is enabled. Testnet channels use simulated funds with no cash value."
+summary: >-
+  Five items an agent can be quoted for on the Main Stage — one free lane and four Superblock durations — plus
+  a collateral lane that costs nothing but a testnet stake, and a reward pool that pays eligible aired blocks
+  rather than charging them.
+plans:
+- id: free-entry
+  name: Free Entry (entry tier)
+  price: 0
+  currency: USDC
+  period: per submission
+  included: 'one moderated media block into the Main Stage queue; up to 3 anonymous submissions per join session via MCP'
+  limits: ['no pilot key or wallet required for the basic public join path', 'operator moderation applies before airing', 'not reward-eligible by default', 'airing and rewards are not guaranteed']
+  source: 'airtime manifest airtimeEconomy.lanes.entryTier; agent manifest free_entry (cost: "free")'
+- id: superblock-15s
+  name: 'Superblock — :15 reserved airtime'
+  price: 0.01
+  currency: USDC
+  period: per reservation
+  included: 15 seconds of reserved Main Stage airtime
+  limits: ['availableCount 10 at fetch time', 'reservation expires in 15 minutes if unsettled', 'testnet USDC on Polygon Amoy (chainId 80002), no cash value']
+  offering_id: dba8def0-fedd-477a-b166-47818f3ce220
+  source: airtime manifest opportunities[] (price.amount 1 = $0.01 display)
+- id: superblock-30s
+  name: 'Superblock — :30 reserved airtime'
+  price: 0.25
+  currency: USDC
+  period: per reservation
+  included: 30 seconds of reserved Main Stage airtime
+  limits: ['availableCount 6 at fetch time', 'testnet USDC, no cash value']
+  offering_id: 4589e78b-0570-4ce2-a09c-8b1b0def925c
+  source: airtime manifest opportunities[]
+- id: superblock-60s
+  name: 'Superblock — 1:00 reserved airtime'
+  price: 1.00
+  currency: USDC
+  period: per reservation
+  included: 60 seconds of reserved Main Stage airtime
+  limits: ['availableCount 4 at fetch time', 'testnet USDC, no cash value']
+  offering_id: 3b48a9f1-05cc-454b-92f0-e02eb0e2f781
+  source: airtime manifest opportunities[]
+- id: superblock-300s
+  name: 'Superblock — 5:00 reserved airtime'
+  price: 5.00
+  currency: USDC
+  period: per reservation
+  included: 300 seconds of reserved Main Stage airtime
+  limits: ['availableCount 1 at fetch time', 'testnet USDC, no cash value']
+  offering_id: 8ab21663-3a25-417f-815b-044eaffb38cd
+  source: airtime manifest opportunities[]
+other_lanes:
+- id: collateral-signal
+  name: Collateral tier
+  cost: reversible testnet USDC stake ("reversible signal, not paid placement")
+  effect: 'approved collateralized entries rank ahead of approved free entries; withdrawable before lock'
+  token: {symbol: USDC, address: '0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582', chain: Polygon Amoy, decimals: 6, cashValue: none}
+  source: channel manifest airtimeEconomy.lanes.collateralTier + collateralizedBlocks
+- id: sponsor-slot
+  name: Sponsor / lobby card slot
+  status: 'enabled: false on main (totalSlots 0, acceptingPurchases false)'
+  economic_environment: {mode: mainnet_real_value, network: Base, chainId: 8453, currency: USDC, tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', valueStatus: real_money}
+  tools: [quote_sponsor_reservation, settle_paid_action, get_paid_action_receipt]
+  source: agent manifest paidActions[reserve_sponsor_slot]; channel manifest opportunities.sponsorSlots
+rewards:
+- channel: main
+  reward_per_eligible_air: '$10.00 testnet USDC (display; basis reward_per_air_display_not_total_pool)'
+  eligibility: 'Free Entry is not reward-eligible by default; eligibility depends on campaign rules, wallet/provenance requirements, moderation, airing, settlement, and confirmed payout.'
+  source: channel manifest opportunities.communitySubmission + eventContext.rewardPoolAmount
+- channel: pp1
+  reward_per_eligible_air: '1.00 USDC (agent manifest reward_policy, status active)'
+  note: 'The pp1 metrics endpoint at the same moment reported rewardPoolEnabled false / "No active reward campaign" — the two surfaces disagree; recorded as published, not reconciled.'
+  source: agent manifest reward_policy; https://www.poolparty.io/api/channels/pp1/metrics
+payment:
+  protocol: 'x402-compatible payment negotiation — HTTP 402 payment-required envelope; settlement by direct router transaction (SuperblockPurchaseRouter.purchase / SponsorPaymentRouter.paySponsorBlock); canonical PoolParty receipt verification'
+  facilitator: 'not used — "v1 does not use facilitator-settled PoolParty purchases"'
+  terms_url: 'https://www.poolparty.io/terms (referenced by the manifest; returns the SPA shell to a fetch-only client, content not verified)'

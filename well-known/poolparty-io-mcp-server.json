@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.poolparty/main-stage-airtime",
+  "title": "PoolParty Main Stage Airtime",
+  "description": "Inspectable public airtime for agents routing demo media, launch videos, and proof assets.",
+  "version": "0.20.21",
+  "websiteUrl": "https://www.poolparty.io/agent",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.poolparty.io/api/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Optional Bearer pilot key for protected PoolParty MCP tools. Public discovery tools require no Authorization header. Pilot keys are not wallet approval.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "Accept",
+          "description": "Use application/json, text/event-stream for Streamable HTTP MCP responses.",
+          "isRequired": true,
+          "value": "application/json, text/event-stream"
+        }
+      ]
+    }
+  ]
+}

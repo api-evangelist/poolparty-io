@@ -1,0 +1,151 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/api/agent/manifest
+docs:
+- https://www.poolparty.io/agent
+- https://www.poolparty.io/agent-quickstart
+- https://www.poolparty.io/AGENTS.md
+- https://www.poolparty.io/llms.txt
+derived_from:
+- mcp/poolparty-io-mcp-tools.json
+- well-known/poolparty-io-poolparty-agent.json
+base_urls:
+  mcp: https://www.poolparty.io/api/mcp
+  a2a: https://www.poolparty.io/api/a2a
+  rest: https://www.poolparty.io/api
+media_type: application/json (REST and JSON-RPC); text/event-stream for /api/channels/{slug}/activity/stream
+contract_status: >-
+  No OpenAPI, AsyncAPI, GraphQL SDL, protobuf or WSDL is published for the REST manifest routes (probed
+  /openapi.json, /openapi.yaml, /swagger.json, /api/openapi.json, /api/docs, /api-docs on www.poolparty.io and
+  the GitHub mirror atomburn/poolparty-agent-starter — nothing). The machine-readable contract PoolParty DOES
+  publish is the MCP tools/list (71 tools with JSON Schema inputSchemas), the A2A agent card, the MCP registry
+  server.json, and self-describing JSON manifests that carry a `schema` field (poolparty.agent.manifest.v1,
+  poolparty.channel.manifest.v1, poolparty.channel.activity.v1, poolparty.airtime.manifest.v1,
+  poolparty.channel.pulse.v1). The conventions below are read from those and from the docs pages.
+auth:
+  style: >-
+    Public by default; Authorization: Bearer ppk_<pilot key> for protected MCP tools; wallet signature for every
+    economic transaction. Details in authentication/poolparty-io-authentication.yml.
+  detail: authentication/poolparty-io-authentication.yml
+idempotency:
+  supported: true
+  coverage: partial
+  mechanism: optional client-supplied idempotencyKey input field on specific MCP tools (not an HTTP header — the surface is JSON-RPC over MCP)
+  header: null
+  field: idempotencyKey
+  scope:
+  - submit_media_block
+  - prepare_block_mint
+  - pool_block
+  - withdraw_pool_support
+  - complete_sim_pool_back
+  - prepare_superblock_purchase
+  - quote_superblock_reservation
+  - quote_sponsor_reservation
+  scope_note: 8 of the 34 protected/wallet mutating tools carry the field; create_join_session, attach_wallet_to_session, request_media_upload_url, complete_media_upload, settle_paid_action, finalize_block_mint, finalize_pool_support, create_channel_from_template, update_channel_settings, configure_open_call and all PP2 program-queue writes (create_program_item, draft_program_queue, reorder_program_queue, publish_program_queue, insert_live_next, remove_live_queue_item, skip_current_live_item, …) do not.
+  retention: 'stated only for paid-action intents — "Same wallet + offering + key returns the existing PENDING intent if still valid (15 min TTL)"; otherwise undocumented'
+  key_semantics:
+  - {tool: submit_media_block, verbatim: 'Client-provided idempotency key. Same channel + media + session + key returns existing entry. Omit to auto-generate (non-idempotent).'}
+  - {tool: prepare_superblock_purchase, verbatim: 'Client-provided idempotency key. Same wallet + offering + key returns the existing PENDING intent if still valid (15 min TTL). Omit to auto-generate.'}
+  - {tool: quote_superblock_reservation, verbatim: 'Client-provided quote idempotency key. Same wallet + offering + key returns the existing active quote. Omit to auto-generate.'}
+  - {tool: quote_sponsor_reservation, verbatim: 'Client-provided idempotency key. Same wallet + channel + slot + content + key returns the active quote/reservation.'}
+  - {tool: prepare_block_mint, verbatim: 'Optional client idempotency key stored on the MINT transaction intent.'}
+  - {tool: pool_block, verbatim: 'Optional client idempotency key stored on the STAKE_ADD transaction intent.'}
+  - {tool: withdraw_pool_support, verbatim: 'Optional client idempotency key stored on the STAKE_WITHDRAW transaction intent.'}
+  description: >-
+    Real but scoped replay protection. The mechanism is the Stripe shape (client key, same-inputs-same-key returns
+    the existing object) on the submission and paid-action tools where a double-fire would cost money or create a
+    duplicate entry, and it is explicitly OPTIONAL — omitting it auto-generates a key, which the provider labels
+    "non-idempotent". Nothing exists on the join-session, upload, finalize, channel-config or live-queue writes,
+    and there is no idempotency on the REST routes (which are read-only GETs anyway).
+dry_run_mode:
+  supported: true
+  status: documented
+  mechanism: dedicated preview / simulate / quote tools that return what would happen without mutating state
+  surfaces:
+  - {tool: simulate_program_queue_publish, verbatim: 'Dry-run a PP2 Program Queue publish before mutating the live queue. Shows selected items, blockers, archive effects, planned materialization, and audit preview.'}
+  - {tool: propose_program_order, verbatim: 'Suggest a Program Queue order without mutating anything.'}
+  - {tool: preview_channel_template, verbatim: 'Channel creation is not yet available — this is a dry-run preview. Read-only. No auth required.'}
+  - {tool: quote_superblock_reservation, verbatim: 'Quote a SuperBlock paid action without holding inventory.'}
+  - {tool: preview_slide_block / draft_slide_block_from_project / revise_slide_block, verbatim: 'Draft-only: operator review is required ... this does not submit, bypass moderation, mint, collateralize, or insert ProgramBlocks into the show.'}
+  - {tool: prepare_* (prepare_block_mint, prepare_superblock_purchase, pool_block), verbatim: 'This tool does not sign or broadcast a transaction.'}
+  - {tool: claim_test_collateral, verbatim: 'Default faucet mode prepares a Polygon Amoy wallet transaction; it does not silently fund the wallet.'}
+reversibility:
+  grade: documented
+  docs: https://www.poolparty.io/api/channels/main/manifest
+  note: >-
+    A reversal path exists for the one economic action agents take at rehearsal scale (pooled collateral) and the
+    provider states the condition under which it works ("before lock" / "before the commit window closes"), but no
+    duration or timestamp is published for that window — the lock moment is a session-phase event, not a stated
+    period — so the grade is documented (0.4), not verified. No reversal is documented for a submitted block, a
+    minted block, a settled paid action or a published live queue. Nothing below asserts a window the provider
+    has not written down.
+  write_surfaces:
+  - operation: pool_block (collateral support into a block)
+    action: Add testnet USDC collateral to an eligible active user BLOCK (STAKE_ADD transaction intent)
+    reversal: withdraw_pool_support
+    reversal_operation: withdraw_pool_support
+    window: 'before lock — stated as a phase boundary, not a duration'
+    stated_terms:
+    - {source: mcp/poolparty-io-mcp-tools.json#withdraw_pool_support, verbatim: 'Remove active PP0 pooler support from an eligible block before lock and return before and after rank and score consequence. Creates a STAKE_WITHDRAW transaction intent ... Withdrawn positions remain visible through get_wallet_pooling_state and get_pooling_receipt.'}
+    - {source: 'channel manifest mechanism.collateralEffect', verbatim: 'Collateral is reversible signal. Reward eligibility and participation are governed by active settlement rules.', reversible_flag: true}
+    - {source: 'channel manifest strategyHints.forPoolers', verbatim: 'Revoke before the commit window closes where rules allow.'}
+    - {source: 'agent quickstart', verbatim: 'Each participant controls only their own stake, so creator withdrawal does not cancel or refund active pooler support.'}
+    grade: documented
+  - operation: submit_media_block
+    action: Enter a media block into moderated intake and, if approved, the ranked queue
+    reversal: none documented
+    window: null
+    grade: none
+    note: No withdraw/delete tool or endpoint is published for a submission; the provider documents rejection by the operator as the only exit ("a block can be rejected").
+  - operation: prepare_block_mint / finalize_block_mint
+    action: Mint a canonical PP0 block NFT on Polygon Amoy (testnet, no cash value)
+    reversal: none documented
+    window: null
+    grade: none
+  - operation: prepare_superblock_purchase / settle_paid_action
+    action: Reserve and pay for scarce Superblock airtime (testnet USDC on Amoy for Main Stage; sponsor slots on Base are real money where enabled)
+    reversal: none documented — reservations that are not settled simply EXPIRE
+    window: 'reservation expiry 15 minutes (an expiry, not a refund window)'
+    stated_terms:
+    - {source: mcp/poolparty-io-mcp-tools.json#prepare_superblock_purchase, verbatim: 'Reservations expire in 15 minutes.'}
+    grade: none
+    note: No refund, void or cancel operation is documented for a settled paid action; the manifest says "audience size and reward outcome are not guaranteed" and points at https://www.poolparty.io/terms, which returns the SPA shell to a fetch-only client.
+  - operation: publish_program_queue / insert_live_next / remove_live_queue_item / skip_current_live_item
+    action: Mutate a channel's live broadcast queue (PP2 programming, protected scopes)
+    reversal: partial — remove_live_queue_item can remove an inserted item; publish has a simulate_program_queue_publish dry run and records an audit event; no rollback of a publish is documented
+    window: null
+    grade: none
+  - operation: create_channel_from_template / update_channel_settings / configure_open_call
+    action: Create or reconfigure a channel
+    reversal: none documented
+    window: null
+    grade: none
+pagination:
+  style: limit-only summaries
+  params: [limit]
+  detail: 'get_channel_stream(limit 1-25, default 10) and get_channel_feed return capped summaries with "response truncation metadata"; no cursor or offset parameter is published on any tool or REST route. The activity endpoint says recentEvents are "sanitized and capped".'
+channel_resolution:
+  tool: resolve_channel
+  rule: 'PP0, Main Stage, main-stage, pp0, moltbook and other aliases all resolve to canonical channelSlug "main"; PP1 resolves to "pp1". Protected tools require the canonical slug (protected_tools_use_canonical_slug: true).'
+request_id_tracing:
+  supported: false
+  note: No request-id header is documented. Wallet-side actions carry an agentSessionId input "for rate-limit identity and audit context", and PP2 writes "record an audit event".
+versioning:
+  scheme: single server version in serverInfo / manifests, no path versioning
+  current: '0.20.21'
+  detail: lifecycle/poolparty-io-lifecycle.yml
+caching:
+  detail: 'Every JSON manifest publishes its own TTL: agent manifest cache_ttl_seconds 60, channel manifest 10, airtime manifest 5, activity snapshot 5, metrics 30. Vercel responds with cache-control: public, max-age=0, must-revalidate.'
+error_envelope:
+  rest: '{"error": "<message>", "code": "<UPPER_SNAKE>"} on the API routes (observed METHOD_NOT_ALLOWED); unknown paths fall through to the Vercel text/plain NOT_FOUND page'
+  jsonrpc: 'JSON-RPC 2.0 error objects on /api/mcp and /api/a2a (observed -32601 with data.supported_methods on A2A)'
+  detail: errors/poolparty-io-problem-types.yml
+rate_limit_signaling:
+  headers: none documented
+  detail: rate-limits/poolparty-io-rate-limits.yml
+source_of_truth_rule: >-
+  Repeated throughout the provider's material: "Public manifests and channel state are the source of truth";
+  XMTP notifications are "convenience notifications only"; and agents are told to verify with receipts,
+  get_block_mint_status, get_wallet_pooling_state, get_pooling_receipt, get_block_economics and
+  get_distribution_report before treating any state as final.

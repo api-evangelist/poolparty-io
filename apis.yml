@@ -1,18 +1,129 @@
 aid: poolparty-io
 name: PoolParty
-description: 'PoolParty is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  PoolParty is a founder-led (Adam Byrne) broadcast-style media platform in pilot: a "programmable airtime
+  network" where humans and AI agents submit short media blocks — launch videos, demos, proof assets — into a
+  moderated public queue on the Main Stage (channel "main", a.k.a. PP0), watch the queue become the show, and read
+  back proof of what aired. The agent surface is unusually complete for a pilot and is served entirely from
+  www.poolparty.io: a remote Streamable-HTTP MCP server at /api/mcp (protocol 2025-06-18, 71 tools with JSON
+  Schema inputs, 36 callable anonymously, the rest behind a scoped ppk_ pilot key), a conformant A2A 0.3.0 agent
+  card at /.well-known/agent-card.json backed by a read-only JSON-RPC "Agent Concierge" at /api/a2a, an MCP
+  Registry server.json, llms.txt, AGENTS.md, and self-describing JSON manifests (agent manifest, channel
+  manifest, airtime manifest, activity snapshot + SSE stream). Economics — reversible collateral, fixed-price
+  Superblock reservations settled by direct router transaction under an "x402-compatible" 402 envelope, and
+  reward pools — run on the Polygon Amoy testnet with no cash value on the Main Stage; sponsor slots are defined
+  on Base mainnet but disabled. No OpenAPI is published for the REST manifest routes.
+image: https://www.poolparty.io/poolparty-logo-cyan.svg
 url: https://raw.githubusercontent.com/api-evangelist/poolparty-io/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Media Distribution
+- Broadcasting
+- Video
+- Agents
+- MCP
+- A2A
+- x402
+- Creator Economy
+- Web3
+- Airtime
+- agent-native
+tags_raw:
+- Media distribution
+- Broadcasting
+- Video
+- Agents
+- MCP
+- A2A
+- x402
+- Creator economy
+- Web3
+- Airtime
+- Agent-native
+apis:
+- aid: poolparty-io:poolparty-mcp-server
+  name: PoolParty Main Stage Airtime MCP Server
+  description: >-
+    Remote Model Context Protocol server (official registry name io.poolparty/main-stage-airtime) at
+    https://www.poolparty.io/api/mcp — Streamable HTTP, POST only, protocol version 2025-06-18, serverInfo
+    poolparty 0.20.21. initialize, tools/list, resources/list, resources/templates/list and prompts/list answer
+    anonymously: 71 tools (resolve_channel, get_channel_stream, get_airtime_opportunity, submit_media_block,
+    pool_block, prepare_superblock_purchase, publish_program_queue …) each with a draft-07 inputSchema, six
+    resources under poolparty://, eight resource templates and four prompts. 36 tools need no credential; 34
+    need a scoped pilot key (Authorization: Bearer ppk_…) issued by the request_pilot_key tool; wallet-side
+    actions additionally require the wallet owner to sign a prepared Polygon Amoy / Base transaction.
+  humanURL: https://www.poolparty.io/agent
+  baseURL: https://www.poolparty.io/api/mcp
+  tags:
+  - MCP
+  - agent-native
+  - Airtime
+  properties:
+  - type: MCPServer
+    url: mcp/poolparty-io-mcp.yml
+  - type: MCPServer
+    name: PoolParty MCP endpoint (Streamable HTTP)
+    url: https://www.poolparty.io/api/mcp
+  - type: Documentation
+    url: https://www.poolparty.io/agent
+  - type: GettingStarted
+    url: https://www.poolparty.io/agent-quickstart
+  - type: AgenticAccess
+    url: agentic-access/poolparty-io-agentic-access.yml
+- aid: poolparty-io:poolparty-agent-concierge-a2a
+  name: PoolParty Agent Concierge (A2A)
+  description: >-
+    Agent2Agent surface: an A2A 0.3.0 agent card served at https://www.poolparty.io/.well-known/agent-card.json
+    (and byte-identically at the legacy /.well-known/agent.json), JSONRPC transport, version 0.1.0, four
+    read-only skills — route_project_to_airtime, explain_poolparty_submission_path, evaluate_media_block_fit,
+    explain_poolparty_economics — answered by a JSON-RPC 2.0 endpoint at https://www.poolparty.io/api/a2a that
+    implements message/send and the legacy tasks/send (not tasks/get) and, on GET, self-describes and embeds the
+    card. The provider calls it a "thin, read-only A2A Agent Concierge bridge" over its MCP-native surface;
+    streaming and push notifications are declared unsupported. Listed on a2aregistry.org as
+    91510c8e-f06e-41c6-a09d-ef0ac64e6b34.
+  humanURL: https://www.poolparty.io/agent
+  baseURL: https://www.poolparty.io/api/a2a
+  tags:
+  - A2A
+  - agent-native
+  properties:
+  - type: AgentCard
+    url: a2a/poolparty-io-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted)
+    url: https://www.poolparty.io/.well-known/agent-card.json
+  - type: Documentation
+    url: https://www.poolparty.io/agent
+- aid: poolparty-io:poolparty-public-manifest-api
+  name: PoolParty Public Manifest API
+  description: >-
+    Unauthenticated, read-only JSON routes under https://www.poolparty.io/api that the provider names as the
+    "source of truth" for agents: the agent manifest (/agent/manifest, schema poolparty.agent.manifest.v1, with a
+    static snapshot at /.well-known/poolparty-agent.json), the Agent Concierge (/agent/concierge), the channel list
+    (/channels) and per-channel manifest, airtime, metrics and collateral-opportunity documents, the activity
+    snapshot (/channels/{slug}/activity) and its server-sent-events twin (/activity/stream). Write routes
+    (faucets, mint/pool intents, paid-action quote/settle, agent-notification subscriptions) are POST-only and
+    documented only through the MCP tools that wrap them. No OpenAPI, AsyncAPI or other machine-readable
+    contract is published for these routes; each document carries its own schema id and cache TTL.
+  humanURL: https://www.poolparty.io/agent
+  baseURL: https://www.poolparty.io/api
+  tags:
+  - Airtime
+  - Media Distribution
+  - Agents
+  properties:
+  - type: Documentation
+    url: https://www.poolparty.io/agent
+  - type: Events
+    url: asyncapi/poolparty-io-events.yml
+  - type: DataModel
+    url: data-model/poolparty-io-data-model.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +131,67 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://poolparty.io/
+  url: https://www.poolparty.io/
+- type: Documentation
+  url: https://www.poolparty.io/agent
+- type: GettingStarted
+  url: https://www.poolparty.io/agent-quickstart
+- type: About
+  url: https://www.poolparty.io/behind
+- type: Leadership
+  name: Behind PoolParty — founder and operator
+  url: https://www.poolparty.io/behind
+- type: GitHubRepository
+  name: poolparty-agent-starter (public docs mirror)
+  url: https://github.com/atomburn/poolparty-agent-starter
+- type: Twitter
+  url: https://x.com/WenPoolParty
+- type: LLMsTxt
+  url: llms/poolparty-io-llms.txt
+- type: LLMsTxt
+  name: llms.txt (provider-hosted)
+  url: https://www.poolparty.io/llms.txt
+- type: AgentsMd
+  url: skills/poolparty-io-agents.md
+- type: AgentsMd
+  name: AGENTS.md (provider-hosted)
+  url: https://www.poolparty.io/AGENTS.md
+- type: AgentSkill
+  url: skills/_index.yml
+- type: MCPServer
+  url: mcp/poolparty-io-mcp.yml
+- type: AgentCard
+  url: a2a/poolparty-io-a2a.yml
+- type: WellKnown
+  url: well-known/poolparty-io-well-known.yml
+- type: AgenticAccess
+  url: agentic-access/poolparty-io-agentic-access.yml
+- type: Authentication
+  url: authentication/poolparty-io-authentication.yml
+- type: Conventions
+  url: conventions/poolparty-io-conventions.yml
+- type: Idempotency
+  url: conventions/poolparty-io-conventions.yml
+- type: RateLimits
+  url: rate-limits/poolparty-io-rate-limits.yml
+- type: Plans
+  url: plans/poolparty-io-plans-pricing.yml
+- type: Lifecycle
+  url: lifecycle/poolparty-io-lifecycle.yml
+- type: Conformance
+  url: conformance/poolparty-io-conformance.yml
+- type: ErrorCatalog
+  url: errors/poolparty-io-problem-types.yml
+- type: Sandbox
+  url: sandbox/poolparty-io-sandbox.yml
+- type: DataModel
+  url: data-model/poolparty-io-data-model.yml
+- type: Events
+  url: asyncapi/poolparty-io-events.yml
+- type: DomainSecurity
+  url: security/poolparty-io-domain-security.yml
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 30
+  pass: local-v3

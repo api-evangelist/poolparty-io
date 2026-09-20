@@ -1,0 +1,57 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/api/agent/manifest
+docs:
+- https://www.poolparty.io/main-stage
+- https://www.poolparty.io/api/channels/main/activity/stream
+asyncapi_spec: null
+asyncapi_note: >-
+  PoolParty publishes NO AsyncAPI document (probed /asyncapi.yaml and /asyncapi.json patterns on www.poolparty.io
+  — SPA shell / 404 — and the GitHub mirror has none). The event surface below is real and typed in the provider's
+  own manifests, so it is captured as an event catalog rather than fabricated into an AsyncAPI.
+event_surface_exists: true
+delivery_models:
+- kind: server-sent-events
+  endpoint: https://www.poolparty.io/api/channels/{slug}/activity/stream
+  observed: {url: 'https://www.poolparty.io/api/channels/main/activity/stream', status: 200, content_type: 'text/event-stream; charset=utf-8', fetched: '2026-09-19'}
+  events:
+  - {event: snapshot, payload_schema: poolparty.channel.activity.v1, note: 'The same document GET /activity returns (session, countdown, intake, queue, nowPlaying, upNext, topEntries, recentEvents), pushed as a stream; cacheTtlSeconds 5.'}
+  auth: none
+  note: 'The provider''s own guidance names this as the compact first-read alongside get_channel_stream ("Read compact current state with get_channel_stream("main") or /api/channels/main/activity before rich reads").'
+- kind: push-notification-subscription (XMTP wallet messaging, not HTTP webhooks)
+  schema: poolparty.agent_lifecycle_subscription.v1
+  status: optional_xmtp_relay_v0
+  transport: xmtp
+  subscription_endpoint: https://www.poolparty.io/api/channels/main/agent-notifications/subscriptions
+  observed: {method: GET, status: 405, body: '{"error":"Method not allowed. Use POST.","code":"METHOD_NOT_ALLOWED"}', note: 'POST-only; not exercised — subscribing would register a wallet.'}
+  delivery: best_effort
+  polling_fallback: true
+  scopes: [wallet, block, session, channel]
+  events:
+  - block.submitted
+  - block.mint_pending
+  - block.mint_finalized
+  - block.approved
+  - block.whirlpool_locked
+  - block.airing
+  - block.settled
+  - collateral.returned
+  - reward.emitted
+  - reward.payout_pending
+  - reward.paid
+  - reward.failed
+  canonical_readback: [get_channel_feed, get_block_mint_status, get_wallet_pooling_state, get_pooling_receipt, get_block_economics, get_distribution_report]
+  source_of_truth_verbatim: 'XMTP messages are convenience notifications only. Canonical state remains PoolParty DB rows, chain receipts, and public API/MCP read endpoints.'
+  privacy: {walletScopedEventsRequireMatchingRecipientWallet: true, channelWideMessagesDoNotIncludePrivateWalletAccounting: true, deliveryFailureDoesNotBlockSettlementOrPayout: true}
+- kind: mcp-list-changed
+  note: 'The MCP server declares tools.listChanged, resources.listChanged and prompts.listChanged true, so connected MCP clients receive notifications/*/list_changed when the flagged paid-action tools appear.'
+- kind: proof-of-play events endpoint
+  endpoint: https://www.poolparty.io/api/channels/main/events
+  observed: {method: GET, status: 405, body: '{"error":"Use POST."}'}
+  note: 'Named as proofOfPlay.eventsUrl in the channel manifest (audience events feeding proof); write-side, not exercised.'
+webhooks:
+  http_callbacks: false
+  note: >-
+    No HTTP webhook (callback URL) mechanism is published. Because the push channel is XMTP wallet messaging and the
+    pull channel is SSE, this artifact is wired with the artifact-native type Events and deliberately NOT with
+    type Webhooks — asserting webhooks the provider does not offer would be a false claim on its behalf.

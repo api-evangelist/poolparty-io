@@ -1,0 +1,98 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.poolparty.io/.well-known/agent-card.json
+derived_from:
+- mcp/poolparty-io-mcp-tools.json
+- well-known/poolparty-io-mcp-server.json
+docs:
+- https://www.poolparty.io/agent
+- https://www.poolparty.io/llms.txt
+summary: >-
+  PoolParty's conformance profile is the agent-protocol stack, verified live: an A2A 0.3.0 agent card at the
+  RFC 8615 canonical path (graded conformant) with a working JSON-RPC 2.0 responder, an MCP server negotiating
+  protocol 2025-06-18 that answers every list method anonymously, a registry server.json on the 2025-12-11
+  schema, llms.txt and AGENTS.md discovery files, and a server-sent-events activity stream. Its payment layer
+  is declared "x402-compatible" with CAIP-2 chain ids (eip155:80002 Polygon Amoy, eip155:8453 Base) and
+  XMTP lifecycle messaging, none of which this pass exercised. It declares no OAuth/OIDC, no RFC 9457 problem
+  details, no RFC 9116 security.txt, no RFC 9727 API catalog, no APIs.json and no RFC 8594 sunset signalling,
+  and publishes no OpenAPI. No domain standard for the broadcast/advertising market (OpenRTB, VAST, SCTE)
+  is declared or detected, and none is asserted here.
+standards:
+- id: a2a
+  name: Agent2Agent protocol
+  version: '0.3.0'
+  conforms: true
+  evidence: 'a2a/poolparty-io-agent-card.json — protocolVersion "0.3.0", url https://www.poolparty.io/api/a2a, preferredTransport JSONRPC, capabilities object, skills[] of 4, securitySchemes + security present; POST /api/a2a message/send returned a role "agent" message with text and data parts. Graded conformant in a2a/poolparty-io-a2a.yml (tasks/get not implemented; tasks/send legacy method also accepted).'
+- id: rfc8615-well-known
+  name: RFC 8615 well-known URIs
+  conforms: true
+  evidence: '/.well-known/agent-card.json, /.well-known/agent.json, /.well-known/mcp/server.json and /.well-known/mcp/server-card.json all served as application/json on www.poolparty.io (well-known/poolparty-io-well-known.yml).'
+- id: mcp
+  name: Model Context Protocol
+  version: '2025-06-18'
+  conforms: true
+  evidence: 'POST https://www.poolparty.io/api/mcp initialize returned protocolVersion "2025-06-18", serverInfo {poolparty, 0.20.21}, capabilities resources/tools/prompts with listChanged true; tools/list returned 71 tools each with a draft-07 inputSchema; resources/list, resources/templates/list and prompts/list all answered. See mcp/poolparty-io-mcp.yml.'
+- id: mcp-registry-server-json
+  name: MCP Registry server.json schema
+  version: '2025-12-11'
+  conforms: true
+  evidence: 'well-known/poolparty-io-mcp-server.json declares $schema https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json; the same name io.poolparty/main-stage-airtime is active in registry.modelcontextprotocol.io (probed 200).'
+- id: json-rpc-2.0
+  conforms: true
+  evidence: 'Both /api/mcp and /api/a2a answer {"jsonrpc":"2.0", ...}; A2A returns a standard -32601 Method not found with a data.supported_methods hint for unimplemented methods.'
+- id: json-schema-draft-07
+  conforms: true
+  evidence: 'Every MCP tool inputSchema carries "$schema": "http://json-schema.org/draft-07/schema#" with additionalProperties false.'
+- id: llms-txt
+  conforms: true
+  evidence: 'https://www.poolparty.io/llms.txt — 200 text/plain, H1 + blockquote + H2 sections in the llms.txt format (llms/poolparty-io-llms.txt).'
+- id: agents-md
+  conforms: true
+  evidence: 'https://www.poolparty.io/AGENTS.md — 200 text/markdown (skills/poolparty-io-agents.md).'
+- id: server-sent-events
+  conforms: true
+  evidence: 'GET https://www.poolparty.io/api/channels/main/activity/stream — 200 text/event-stream with "event: snapshot" frames carrying poolparty.channel.activity.v1 JSON.'
+- id: x402
+  name: x402 HTTP payment protocol
+  conforms: true
+  verification: declared-only
+  evidence: 'Agent and channel manifests: paymentProtocols[0].id "x402-compatible-payment-negotiation", envelope "HTTP 402 payment-required envelope"; prepare_superblock_purchase "returns an HTTP 402 payment-required envelope for x402-compatible payment negotiation" when the flag is on. The provider calls it x402-COMPATIBLE and says v1 settles by direct router transaction, not through a facilitator.'
+  note: No 402 was observed — reaching one means preparing a purchase, which this pipeline does not do.
+- id: caip-2
+  name: CAIP-2 chain identifiers
+  conforms: true
+  evidence: 'paidActions[].network "eip155:80002" (Polygon Amoy) and "eip155:8453" (Base) in the agent manifest.'
+- id: xmtp
+  name: XMTP wallet messaging
+  conforms: true
+  verification: declared-only
+  evidence: 'agent_notifications.transport "xmtp", subscription_url https://www.poolparty.io/api/channels/main/agent-notifications/subscriptions (GET returns 405 METHOD_NOT_ALLOWED — POST-only, not exercised).'
+- id: robots-txt
+  conforms: true
+  evidence: 'https://www.poolparty.io/robots.txt — explicit Allow list for the agent surfaces, Disallow for /api/admin/, /api/cron/, /api/db/, Sitemap directive.'
+- id: oauth2
+  conforms: false
+  evidence: 'No oauth2 scheme anywhere; /.well-known/oauth-authorization-server and /.well-known/oauth-protected-resource return the SPA shell.'
+- id: oidc
+  conforms: false
+  evidence: '/.well-known/openid-configuration returns the SPA shell.'
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: 'REST errors are {"error","code"} JSON or the Vercel text/plain NOT_FOUND page; no application/problem+json.'
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: '/.well-known/security.txt and /security.txt return the SPA shell.'
+- id: rfc9727-api-catalog
+  conforms: false
+  evidence: '/.well-known/api-catalog returns the SPA shell; /.well-known/api-catalog.json 404.'
+- id: apis-json
+  conforms: false
+  evidence: '/apis.json 404; /.well-known/apis.json 404; /apis.yml SPA shell.'
+- id: rfc8594-sunset
+  conforms: false
+  evidence: No Sunset or Deprecation headers documented or observed.
+- id: openapi
+  conforms: false
+  evidence: 'No OpenAPI/Swagger at /openapi.json (404), /openapi.yaml (shell), /swagger.json (404), /api/openapi.json (404), /api/docs (404), nor in the GitHub mirror.'
+domain_standard_conformance: []
+compliance_program: none published — no trust center, no certifications, no security policy page (probe-security-programs.py 2026-09-19 vdp=none trust=none); no Compliance pointer is emitted.

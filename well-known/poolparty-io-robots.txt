@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /agent
+Allow: /behind
+Allow: /main-stage
+Allow: /moltbook
+Allow: /channels/main
+Allow: /app/channel/main
+Allow: /api/agent/manifest
+Allow: /llms.txt
+Allow: /AGENTS.md
+Allow: /.well-known/poolparty-agent.json
+Allow: /.well-known/agent-card.json
+Allow: /.well-known/agent.json
+Allow: /.well-known/mcp/server.json
+Allow: /.well-known/mcp/server-card.json
+Allow: /server.json
+Allow: /mcp-server-card.json
+Allow: /api/a2a
+Allow: /api/channels
+Allow: /api/channels/main/manifest
+Allow: /api/channels/main/metrics
+Allow: /api/channels/pp1
+Allow: /api/channels/pp1/airtime
+Allow: /api/channels/pp1/metrics
+Allow: /api/mcp
+
+Disallow: /api/admin/
+Disallow: /api/cron/
+Disallow: /api/db/
+
+Sitemap: https://www.poolparty.io/sitemap.xml

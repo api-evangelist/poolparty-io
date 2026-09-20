@@ -1,0 +1,113 @@
+generated: '2026-09-19'
+method: probed
+source: https://www.poolparty.io/.well-known/agent-card.json
+card:
+  file: a2a/poolparty-io-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: www.poolparty.io
+  note: >-
+    Served from www.poolparty.io, which is the only origin PoolParty runs: the apex poolparty.io answers 308
+    to www for every path, and www hosts the website, the MCP endpoint (/api/mcp), the A2A JSON-RPC endpoint
+    (/api/a2a) and the public JSON manifests. The legacy /.well-known/agent.json is ALSO served and is
+    byte-identical (7,126 bytes) to the canonical card. The www host is a Vercel SPA that answers 200 with a
+    15,925-byte HTML shell for any extensionless or .txt path, including a negative-control path that cannot
+    exist, so a 200 alone proves nothing here; the card is accepted because it came back as
+    application/json, parsed as a JSON object with the full AgentCard shape, and the provider's own
+    robots.txt, sitemap.xml, llms.txt, AGENTS.md and MCP server card all name exactly this URL. Ownership is
+    not in question: provider.organization is "PoolParty" with provider.url https://www.poolparty.io/, the
+    card's url is on the same host, and the a2aregistry.org record (id 91510c8e-f06e-41c6-a09d-ef0ac64e6b34)
+    names the same canonical card URL and endpoint.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  checks:
+    capabilities_is_object: true
+    protocolVersion_present: true
+    skills_is_array: true
+    preferredTransport_present: true
+    defaultInputModes_present: true
+    defaultOutputModes_present: true
+    securitySchemes_present: true
+  deviations: []
+  observations:
+  - securitySchemes.publicDiscovery declares type "none", which is not one of the A2A SecurityScheme types (apiKey, http, oauth2, openIdConnect, mutualTLS); the intent (anonymous access) is clear and the second scheme (protectedMcpBearer, http/bearer) is well-formed.
+  - Non-standard top-level keys are present (author, wellKnownURI, homepage, poolparty); A2A tolerates extension keys and they carry useful discovery data (MCP endpoint, server descriptor, registries).
+  - The JSON-RPC endpoint implements message/send and the pre-0.3 tasks/send, plus the four skill ids as method names, but NOT tasks/get (A2A core) — it answers -32601 Method not found with data.supported_methods. The provider describes the surface as a "thin, read-only A2A Agent Concierge bridge" over MCP, and the card says so in poolparty.caveat.
+  - streaming, pushNotifications and stateTransitionHistory are all declared false; supportsAuthenticatedExtendedCard is false, and agent/getAuthenticatedExtendedCard returns -32601, consistent with the card.
+agent_card:
+  name: PoolParty Agent Concierge
+  description: >-
+    MCP-native PoolParty discovery bridge that helps agents and humans route launch videos, demo media, proof
+    assets, creator/project blocks, and agent-marketplace projects toward inspectable public airtime.
+  url: https://www.poolparty.io/api/a2a
+  version: 0.1.0
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  provider: {organization: PoolParty, url: 'https://www.poolparty.io/'}
+  documentation_url: https://www.poolparty.io/agent
+  icon_url: https://www.poolparty.io/poolparty-logo-cyan.svg
+  default_input_modes: [text/plain, application/json]
+  default_output_modes: [text/plain, application/json]
+  capabilities: {streaming: false, pushNotifications: false, stateTransitionHistory: false}
+  security: [{publicDiscovery: []}]
+  skills: 4
+  skill_ids: [route_project_to_airtime, explain_poolparty_submission_path, evaluate_media_block_fit, explain_poolparty_economics]
+  extension_keys:
+    mcpEndpoint: https://www.poolparty.io/api/mcp
+    mcpServerDescriptor: https://www.poolparty.io/.well-known/mcp/server.json
+    mcpServerCard: https://www.poolparty.io/.well-known/mcp/server-card.json
+    agentManifest: https://www.poolparty.io/api/agent/manifest
+    poolpartyWellKnownManifest: https://www.poolparty.io/.well-known/poolparty-agent.json
+    llmsTxt: https://www.poolparty.io/llms.txt
+    agentsMd: https://www.poolparty.io/AGENTS.md
+    publicDocsMirror: https://github.com/atomburn/poolparty-agent-starter
+    posture: mcp_native_with_thin_a2a_concierge_bridge
+registries:
+  a2aregistry_org:
+    id: 91510c8e-f06e-41c6-a09d-ef0ac64e6b34
+    url: https://a2aregistry.org/agents/91510c8e-f06e-41c6-a09d-ef0ac64e6b34/
+    observed: '2026-09-19'
+    note: The registry page (HTTP 200 after a 301 to the trailing-slash URL) names the same canonical card URL and endpoint, protocol 0.3.0, agent version 0.1.0, and shows a 100% 30-day reachability record. The registry listing was the harvest lead; the card above was fetched directly from the provider host.
+  official_mcp_registry: io.poolparty/main-stage-airtime (see mcp/poolparty-io-mcp.yml)
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://www.poolparty.io/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 7126
+  body_parses_as: JSON object with AgentCard shape (protocolVersion, name, description, url, version, provider, documentationUrl, preferredTransport, defaultInputModes, defaultOutputModes, capabilities, skills, securitySchemes, security)
+  corroborating_probes:
+  - url: https://www.poolparty.io/.well-known/agent.json
+    http_status: 200
+    content_type: application/json; charset=utf-8
+    note: Legacy path, byte-identical to the canonical card (diff clean).
+  - url: https://poolparty.io/.well-known/agent-card.json
+    http_status: 308
+    note: Apex redirects to https://www.poolparty.io/.well-known/agent-card.json.
+  - url: https://www.poolparty.io/.well-known/apievangelist-negative-control-7f3a9c.json
+    http_status: 404
+    note: A .json path that cannot exist returns the Vercel text/plain NOT_FOUND page (79 bytes), so .json 200s on this host are served documents.
+  - url: https://www.poolparty.io/.well-known/apievangelist-negative-control-7f3a9c
+    http_status: 200
+    note: An extensionless path that cannot exist returns the 15,925-byte SPA shell — the host is a catch-all for non-.json paths, which is why HTML 200s elsewhere in this repo are recorded as misses.
+  - url: https://www.poolparty.io/api/a2a
+    method: GET
+    http_status: 200
+    response_summary: '{"ok":true,"read_only":true,"endpoint":"https://www.poolparty.io/api/a2a","agent_card":"...","supported_methods":["message/send","tasks/send","route_project_to_airtime","explain_poolparty_submission_path","evaluate_media_block_fit","explain_poolparty_economics"],"card":{...}}'
+    note: The endpoint self-describes on GET and embeds the card.
+  - url: https://www.poolparty.io/api/a2a
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tasks/get","params":{"id":"apievangelist-nonexistent-probe"}}'
+    http_status: 200
+    response: '{"jsonrpc":"2.0","id":1,"error":{"code":-32601,"message":"Method not found","data":{"supported_methods":[...]}}}'
+    note: tasks/get is not implemented; a real JSON-RPC 2.0 responder nonetheless.
+  - url: https://www.poolparty.io/api/a2a
+    method: POST
+    body: '{"jsonrpc":"2.0","id":3,"method":"message/send","params":{"message":{"role":"user","messageId":"apievangelist-probe-1","parts":[{"kind":"text","text":"What is PoolParty?"}]}}}'
+    http_status: 200
+    response_summary: 'result.kind "message", role "agent", a text part (confidence/recommendation/why/next step/links/caveats) and a data part with schema poolparty.a2a.concierge.response.v1, intent route_project_to_airtime, confidence high.'
+    note: One read-only concierge question, which is what the surface is for. Nothing was submitted, reserved or paid.

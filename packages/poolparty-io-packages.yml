@@ -1,0 +1,17 @@
+generated: '2026-09-19'
+method: searched
+source: registry searches 2026-09-19
+package_count: 0
+packages: []
+searched:
+- {registry: npm, query: 'https://registry.npmjs.org/-/v1/search?text=poolparty%20mcp&size=10', result: '0 first-party packages (results are generic MCP SDKs)'}
+- {registry: npm, query: 'https://registry.npmjs.org/-/v1/search?text=poolparty.io&size=10', result: 0 packages}
+- {registry: pypi, query: 'https://pypi.org/pypi/poolparty-mcp/json', status: 404}
+- {registry: pypi, query: 'https://pypi.org/pypi/poolparty/json', status: 200, result: 'UNRELATED — "poolparty 0.1.1", a Python package for designing oligonucleotide sequence libraries (authors Zhihan Liu, Aidan Cordero, Justin B. Kinney). Not this provider; not linked.'}
+- {registry: github, query: 'https://api.github.com/repos/atomburn/poolparty-agent-starter', status: 200, result: 'The provider''s public docs mirror (README, AGENTS.md, llms.txt, six example request files). No SDK, CLI, package manifest or OpenAPI in the tree (11 files). Created and last pushed 2026-05-30.'}
+- {registry: github-user, query: 'https://api.github.com/users/atomburn/repos', result: '4 public repos; only poolparty-agent-starter relates to PoolParty'}
+- {registry: mcp-registry, query: 'https://registry.modelcontextprotocol.io/v0/servers?search=io.poolparty/main-stage-airtime', result: 'remotes[] only (streamable-http URL) — no packages[] entry, i.e. no npm/pypi stdio distribution is registered'}
+note: >-
+  PoolParty publishes no client library, CLI or SDK in any registry searched, and its own MCP server card,
+  llms.txt and AGENTS.md reference none — the documented ways in are raw HTTP to the JSON manifests, the remote
+  MCP endpoint, or the A2A endpoint. No Packages or SDKs pointer is emitted.

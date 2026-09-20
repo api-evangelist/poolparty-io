@@ -1,0 +1,109 @@
+generated: '2026-09-19'
+method: derived
+source: mcp/poolparty-io-mcp-tools.json
+docs:
+- https://www.poolparty.io/api/agent/manifest
+- https://www.poolparty.io/api/channels/main/manifest
+- https://www.poolparty.io/api/channels/main/activity
+summary: >-
+  Derived from the 71 MCP tool inputSchemas, the six resource URIs and eight resource templates, and the live
+  JSON manifests (agent, channel, airtime, activity, metrics, collateral opportunity). There is no OpenAPI and
+  no $ref graph; the model links by id fields passed between tools (channelSlug, sessionToken, blockId, entryId,
+  walletAddress, positionId, intentId, txHash, offeringId, candidateId). The root is the CHANNEL (a slug with
+  aliases, an operator wallet and a program type); a SESSION runs on a channel through phases; BLOCKS enter the
+  session's queue as ENTRIES; a WALLET is the economic identity that mints blocks, pools collateral into them
+  and pays for Superblocks; a PILOT KEY is the automation identity, scoped and channel-bound.
+id_style:
+  format: mixed — UUIDs for channels/sessions/entries/offerings/programs; prefixed opaque strings for blocks; slugs for channels; EVM addresses for wallets; tx hashes for settlements
+  examples:
+  - {entity: Channel, id: 'f6f0c188-c44a-4da9-a6b2-ce3e8c1d8e7c', slug: main}
+  - {entity: Session, id: '55f2ace9-6b8e-4120-a228-88dd74a2277e'}
+  - {entity: Block, id: 'free-1782145244478-1wl42dxy', note: 'lane prefix + timestamp + random'}
+  - {entity: Entry, id: '7ac3d352-1b84-4908-99f1-c048b0a497e7'}
+  - {entity: SuperblockOffering, id: 'dba8def0-fedd-477a-b166-47818f3ce220'}
+  - {entity: Wallet, id: '0x009b6639ce8628425da05861239368cc85be22e9', note: 'Main Stage operator wallet as published in the channel manifest'}
+  - {entity: PilotKey, id: 'ppk_… (redacted fingerprint via get_key_info)'}
+entities:
+- name: Platform
+  description: 'poolparty://platform/manifest — identity, capabilities, auth model, economic primitives, pilot status; plus program-modes (broadcast_loop, video_queue, screening_session), block-types (media, notice, qr_card, queue_status, community_slot, schedule_card, sponsor_slot) and channel-templates.'
+  relationships: [{has_many: Channel}]
+- name: Channel
+  fields: [id, slug, name, description, status (ACTIVE_PUBLIC | ACTIVE_UNLISTED), visibility (public | unlisted), discovery_status (featured | hidden), operatorWallet, program_type (CURATION_QUEUE | LOOP_DECK | WHIRLPOOL_QUEUE), channelRole (main_stage), aliases, manifest_url]
+  resources: ['poolparty://channels', 'poolparty://channels/{slug}/manifest', 'poolparty://channels/{slug}/airtime']
+  rest: ['/api/channels', '/api/channels/{slug}', '/api/channels/{slug}/manifest', '/api/channels/{slug}/airtime', '/api/channels/{slug}/metrics', '/api/channels/{slug}/activity', '/api/channels/{slug}/activity/stream']
+  relationships:
+  - {has_one: Program, via: activeProgram.id}
+  - {has_one: ScreeningSession, via: screeningSession.id}
+  - {has_many: SuperblockOffering, via: 'airtime opportunities[]'}
+  - {belongs_to: Wallet, via: operatorWallet, note: operator}
+  - {has_many: ProgramQueueItem, via: 'poolparty://channels/{slug}/program-queue (PP2)'}
+  - {has_many: Candidate, via: 'poolparty://channels/{slug}/candidate-inventory (PP2)'}
+- name: Program
+  fields: [id, type (CURATION_QUEUE), profile, status, blockCount, playbackMode]
+  relationships: [{belongs_to: Channel}, {has_many: Block}]
+- name: ScreeningSession
+  fields: [id, title, status, phase (LOBBY | live show | post), phaseChangedAt, startTime, scheduledEndTime, liveScene, programBlockCount, lobbyAssetCount, playbackState (lobby_hold)]
+  relationships: [{belongs_to: Channel}, {has_many: Entry, via: queue partition}, {has_one: RewardCampaign}]
+- name: JoinSession
+  fields: [sessionToken, channelSlug, submissions used (max 3), attached walletAddress]
+  created_by: create_join_session
+  relationships: [{belongs_to: Channel, via: channelSlug}, {has_many: Block, via: submit_media_block}, {has_one: Wallet, via: attach_wallet_to_session}]
+- name: Block
+  aliases: [MediaBlock, ProgramBlock, SlideBlock]
+  fields: [blockId, title, videoUrl | playbackId, thumbnailUrl, duration, lane (free_entry | collateral_signal | superblock | operator_block), status (approved_ready | …), mintStatus (not_started | prepared | pending | …), poolEligibility, totalCollateral, canonicalMediaHandoff]
+  created_by: submit_media_block (or draft_slide_block_from_project → preview_slide_block for review-only packages)
+  relationships:
+  - {belongs_to: Channel, via: channelSlug}
+  - {belongs_to: JoinSession, via: sessionToken}
+  - {has_one: Entry, via: entryId}
+  - {has_one: MintIntent, via: prepare_block_mint}
+  - {has_many: PoolPosition, via: pool_block}
+  - {has_one: DistributionReport, via: get_distribution_report}
+  - {has_one: BlockEconomics, via: get_block_economics}
+- name: Entry
+  fields: [entryId, blockId, rank, lane, status, durationSeconds, totalCollateral, estimatedTimeToAirMs]
+  relationships: [{belongs_to: Block}, {belongs_to: ScreeningSession}]
+- name: Wallet
+  fields: [walletAddress (EVM), chain (Amoy 80002 | Base 8453)]
+  relationships:
+  - {has_many: PoolPosition, via: walletAddress}
+  - {has_many: TransactionIntent}
+  - {has_many: PaidActionIntent, via: bound wallet}
+  - {has_many: Channel, via: operatorWallet, note: as operator}
+  - {has_many: AgentNotificationSubscription, via: wallet scope}
+- name: PilotKey
+  fields: ['redacted key id/fingerprint', 'scopes[]', 'allowed channel aliases[]', expiry, 'rate-limit tier']
+  created_by: request_pilot_key → check_key_request_status
+  read_by: get_key_info
+  relationships: [{has_many: Channel, via: allowed channels}]
+- name: TransactionIntent
+  kinds: [MINT, STAKE_ADD, STAKE_WITHDRAW]
+  fields: [txIntentId, idempotencyKey, walletAddress, blockId, amount, txHash (after broadcast)]
+  created_by: [prepare_block_mint, pool_block, withdraw_pool_support]
+  finalized_by: [finalize_block_mint, finalize_pool_support]
+  relationships: [{belongs_to: Wallet}, {belongs_to: Block}]
+- name: PoolPosition
+  fields: [positionId, walletAddress, blockId, amount, state (active | locked | withdrawn | settled | voided | error)]
+  read_by: [get_wallet_pooling_state, get_pooling_receipt]
+  relationships: [{belongs_to: Wallet}, {belongs_to: Block}, {has_one: PoolingReceipt}]
+- name: SuperblockOffering
+  fields: [offeringId, durationSeconds, 'price {amount, currency, display}', availableCount, refreshCadenceSeconds, economicEnvironment, 'supportedActions[]']
+  read_by: [get_superblock_offerings, get_sponsor_opportunities]
+  relationships: [{belongs_to: Channel}, {has_many: PaidActionIntent}]
+- name: PaidActionIntent
+  fields: [intentId, offeringId | sponsor slot, wallet, amount, chainId, 402 envelope, settle endpoint, receipt endpoint, expires (15 min), entitlementId]
+  lifecycle: [quote_superblock_reservation | quote_sponsor_reservation, prepare_superblock_purchase, settle_paid_action (txHash), get_paid_action_receipt]
+  relationships: [{belongs_to: SuperblockOffering}, {belongs_to: Wallet}, {has_one: Receipt}]
+- name: RewardCampaign
+  fields: [rewardPerAir, rewardAsset, rewardPoolFunded, rewardEligibilityEvent (eligible_submission_aired), status]
+  read_by: [get_reward_opportunities, get_channel_metrics]
+  relationships: [{belongs_to: Channel}]
+- name: AgentNotificationSubscription
+  fields: ['scopes (wallet | block | session | channel)', 'transport xmtp', 'supportedEvents (12 event names)']
+  created_by: 'POST /api/channels/{slug}/agent-notifications/subscriptions'
+  relationships: [{belongs_to: Wallet}, {belongs_to: Channel}]
+- name: Candidate / ProgramQueueItem / LiveQueueItem (PP2 programming)
+  fields: [candidateId, source metadata, renderability, bucket label, order]
+  resources: ['poolparty://channels/{slug}/candidate-inventory', 'poolparty://channels/{slug}/candidates/{candidateId}/preview', 'poolparty://channels/{slug}/programming-buckets', 'poolparty://channels/{slug}/program-queue', 'poolparty://channels/{slug}/live-queue', 'poolparty://channels/{slug}/programming-policy']
+  relationships: [{belongs_to: Channel}]
+expansion: none — no include/expand/fields parameter; the provider's pattern is compact first-read (get_channel_stream) then explicit drill-down tools.

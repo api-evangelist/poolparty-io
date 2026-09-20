@@ -1,0 +1,166 @@
+generated: '2026-09-19'
+method: probed
+source: >-
+  Live GET probes of the named /.well-known/* path list on poolparty.io and www.poolparty.io, 2026-09-19.
+  Every row below is a request that was actually issued; every status is the one returned.
+summary:
+  hosts_probed: 2
+  paths_probed: 46
+  documents_served: 5
+  hit_count: 5
+  path_echo_control: passed
+  soft_404_control:
+    note: >-
+      www.poolparty.io is a Vercel-hosted single-page app with a catch-all: every extensionless or .txt path
+      that does not exist returns HTTP 200 text/html with the same 15,925-byte shell (negative controls
+      /.well-known/apievangelist-negative-control-7f3a9c and the same path with .txt both 200 at 15,925
+      bytes). A .json path that does not exist returns the Vercel text/plain NOT_FOUND page (404, 79 bytes).
+      So every 200 text/html of 15,925 bytes below is a MISS recorded as such, and a hit requires a non-HTML
+      body that parses. The five documents that pass that bar are the A2A agent card (both paths), the MCP
+      server descriptor and server card, and the provider's own poolparty-agent.json manifest. None of the
+      standards-named documents in the closed list is served: no security.txt, no OAuth/OIDC discovery, no
+      RFC 9728 protected-resource metadata for the MCP resource, no RFC 9727 API catalog, no APIs.json, no
+      AAuth, no ai-plugin, no UCP/ACP.
+  mcp_host_note: >-
+    The MCP server host is www.poolparty.io itself (endpoint /api/mcp), so the RFC 9728 protected-resource
+    probe on the MCP host is the www row below — an HTML shell, i.e. not served. The pilot-key bearer scheme
+    is documented in prose and in the MCP server descriptor instead.
+hosts:
+- host: poolparty.io
+  role: Apex — 308 permanent redirect to www.poolparty.io for every path, serves nothing of its own
+  documents:
+  - {path: /.well-known/agent-card.json, status: 308, redirect: 'https://www.poolparty.io/.well-known/agent-card.json'}
+  - {path: /.well-known/agent.json, status: 308}
+  - {path: /.well-known/security.txt, status: 308}
+  - {path: /security.txt, status: 308}
+  - {path: /.well-known/openid-configuration, status: 308}
+  - {path: /.well-known/oauth-authorization-server, status: 308}
+  - {path: /.well-known/oauth-protected-resource, status: 308}
+  - {path: /.well-known/api-catalog, status: 308}
+  - {path: /.well-known/api-catalog.json, status: 308}
+  - {path: /.well-known/ai-plugin.json, status: 308}
+  - {path: /.well-known/ucp.json, status: 308}
+  - {path: /.well-known/acp.json, status: 308}
+  - {path: /.well-known/aauth-resource.json, status: 308}
+  - {path: /.well-known/apis.json, status: 308}
+  - {path: /apis.json, status: 308}
+  - {path: /apis.yml, status: 308}
+  - {path: /.well-known/mcp/server.json, status: 308}
+  - {path: /.well-known/mcp/server-card.json, status: 308}
+  - {path: /llms.txt, status: 308}
+  - {path: /.well-known/apievangelist-negative-control-7f3a9c.json, status: 308, control: negative}
+- host: www.poolparty.io
+  role: Website, MCP server host (/api/mcp), A2A JSON-RPC host (/api/a2a) and public manifest API — one Vercel origin
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 7126
+    file: ../a2a/poolparty-io-agent-card.json
+    standard: A2A Agent Card (protocolVersion 0.3.0)
+    note: Saved verbatim under a2a/ and graded conformant in a2a/poolparty-io-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 7126
+    file: ../a2a/poolparty-io-agent-card.json
+    note: Legacy pre-0.3 path, byte-identical to the canonical card; not saved twice.
+  - path: /.well-known/mcp/server.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 1043
+    file: poolparty-io-mcp-server.json
+    standard: MCP Registry server.json (schema 2025-12-11)
+    note: 'name io.poolparty/main-stage-airtime, version 0.20.21, one streamable-http remote at https://www.poolparty.io/api/mcp with an optional Authorization header (isSecret) and a required Accept header. Byte-identical mirror at /server.json (200).'
+  - path: /.well-known/mcp/server-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 3728
+    file: poolparty-io-mcp-server-card.json
+    standard: provider-defined (schema poolparty.mcp.server_card.v1)
+    note: 'Names the registries the server is listed in (official MCP registry publishedAt 2026-05-30, Glama, a2aregistry), the transport, headers, auth split and 11 resource URIs. Byte-identical mirror at /mcp-server-card.json (200).'
+  - path: /.well-known/poolparty-agent.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 120599
+    file: poolparty-io-poolparty-agent.json
+    standard: provider-defined (schema poolparty.agent.manifest.v1)
+    note: >-
+      A static snapshot of the agent manifest (server_time 2026-06-04); the live copy at /api/agent/manifest
+      (same schema, same version 0.20.21, 105,117 bytes) has since gained paidActions, paymentProtocols and
+      settlementModes and reports 70 current tools against the snapshot's 66. The provider's own guidance
+      says the live manifests are the source of truth.
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell, not a security.txt. Miss.
+  - path: /security.txt
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss.
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss — no OIDC discovery.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss — no RFC 8414 metadata.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss — this is also the MCP resource host and no RFC 9728 metadata is served for it.
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss.
+  - {path: /.well-known/api-catalog.json, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/ucp.json, status: 404}
+  - {path: /.well-known/acp.json, status: 404}
+  - {path: /.well-known/aauth-resource.json, status: 404}
+  - {path: /.well-known/apis.json, status: 404}
+  - {path: /apis.json, status: 404}
+  - path: /apis.yml
+    status: 200
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: SPA shell. Miss.
+  - {path: /.well-known/mcp.json, status: 404}
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 5102
+    file: ../llms/poolparty-io-llms.txt
+    note: Not a /.well-known/ document, recorded here because it is a served discovery file; saved under llms/.
+  - path: /AGENTS.md
+    status: 200
+    content_type: text/markdown; charset=utf-8
+    bytes: 5605
+    file: ../skills/poolparty-io-agents.md
+    note: Served discovery file; saved verbatim under skills/.
+  - path: /.well-known/apievangelist-negative-control-7f3a9c.json
+    status: 404
+    control: negative
+    note: A .json path that cannot exist. 404 text/plain (79 bytes, Vercel NOT_FOUND) — .json 200s on this host are real.
+  - path: /.well-known/apievangelist-negative-control-7f3a9c
+    status: 200
+    control: negative
+    content_type: text/html; charset=utf-8
+    bytes: 15925
+    note: An extensionless path that cannot exist. 200 with the SPA shell — proves the catch-all, which is why every 15,925-byte HTML 200 above is a miss.
+robots_txt:
+  url: https://www.poolparty.io/robots.txt
+  status: 200
+  file: poolparty-io-robots.txt
+  note: >-
+    A single "User-agent: *" group that explicitly Allows the agent surfaces (/agent, /llms.txt, /AGENTS.md,
+    both agent-card paths, both MCP descriptor paths and their root mirrors, /api/a2a, /api/mcp, the channel
+    manifest/metrics/airtime routes) and Disallows /api/admin/, /api/cron/ and /api/db/. Sitemap:
+    https://www.poolparty.io/sitemap.xml (200, application/xml, 16 URLs, lastmod 2026-05-18 on the docs pages).
