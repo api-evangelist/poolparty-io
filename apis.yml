@@ -13,6 +13,21 @@ description: >-
   Superblock reservations settled by direct router transaction under an "x402-compatible" 402 envelope, and
   reward pools — run on the Polygon Amoy testnet with no cash value on the Main Stage; sponsor slots are defined
   on Base mainnet but disabled. No OpenAPI is published for the REST manifest routes.
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - atomburn/poolparty-agent-starter
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://www.poolparty.io/poolparty-logo-cyan.svg
 url: https://raw.githubusercontent.com/api-evangelist/poolparty-io/refs/heads/main/apis.yml
 x-type: company
@@ -33,7 +48,7 @@ tags:
 - Creator Economy
 - Web3
 - Airtime
-- agent-native
+- Agent-Native
 tags_raw:
 - Media distribution
 - Broadcasting
@@ -46,6 +61,7 @@ tags_raw:
 - Web3
 - Airtime
 - Agent-native
+- agent-native
 apis:
 - aid: poolparty-io:poolparty-mcp-server
   name: PoolParty Main Stage Airtime MCP Server
@@ -61,6 +77,10 @@ apis:
   humanURL: https://www.poolparty.io/agent
   baseURL: https://www.poolparty.io/api/mcp
   tags:
+  - MCP
+  - Agent-Native
+  - Airtime
+  tags_raw:
   - MCP
   - agent-native
   - Airtime
@@ -90,6 +110,9 @@ apis:
   humanURL: https://www.poolparty.io/agent
   baseURL: https://www.poolparty.io/api/a2a
   tags:
+  - A2A
+  - Agent-Native
+  tags_raw:
   - A2A
   - agent-native
   properties:
@@ -195,3 +218,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 30
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://www.poolparty.io/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.3.0"
+  control: 404
