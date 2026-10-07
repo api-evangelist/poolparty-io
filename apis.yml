@@ -153,6 +153,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Pricing
+  url: https://www.poolparty.io/api/channels/main/airtime
 - url: https://www.poolparty.io/blog/
   type: Blog
 - type: Website
