@@ -91,3 +91,46 @@ payment:
   protocol: 'x402-compatible payment negotiation — HTTP 402 payment-required envelope; settlement by direct router transaction (SuperblockPurchaseRouter.purchase / SponsorPaymentRouter.paySponsorBlock); canonical PoolParty receipt verification'
   facilitator: 'not used — "v1 does not use facilitator-settled PoolParty purchases"'
   terms_url: 'https://www.poolparty.io/terms (referenced by the manifest; returns the SPA shell to a fetch-only client, content not verified)'
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - subscription
+  units: []
+  plans:
+  - name: Free Entry (entry tier)
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Superblock — :15 reserved airtime
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Superblock — :30 reserved airtime
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Superblock — 1:00 reserved airtime
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Superblock — 5:00 reserved airtime
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods:
+    - other
