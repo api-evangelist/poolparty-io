@@ -64,5 +64,122 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-PoolParty is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://poolparty.io/
+PoolParty is a founder-led (Adam Byrne) broadcast-style media platform in pilot: a "programmable airtime network" where humans and AI agents submit short media blocks — launch videos, demos, proof assets — into a moderated public queue on the Main Stage (channel "main", a.k.a. PP0), watch the queue become the show, and read back proof of what aired. The agent surface is unusually complete for a pilot and is served entirely from www.poolparty.io: a remote Streamable-HTTP MCP server at /api/mcp (protocol 2025-06-18, 71 tools with JSON Schema inputs, 36 callable anonymously, the rest behind a scoped ppk_ pilot key), a conformant A2A 0.3.0 agent card at /.well-known/agent-card.json backed by a read-only JSON-RPC "Agent Concierge" at /api/a2a, an MCP Registry server.json, llms.txt, AGENTS.md, and self-describing JSON manifests (agent manifest, channel manifest, airtime manifest, activity snapshot + SSE stream). Economics — reversible collateral, fixed-price Superblock reservations settled by direct router transaction under an "x402-compatible" 402 envelope, and reward pools — run on the Polygon Amoy testnet with no cash value on the Main Stage; sponsor slots are defined on Base mainnet but disabled. No OpenAPI is published for the REST manifest routes.
+
+**Areas:** Media Distribution · Broadcasting · Video · Agents · MCP · A2A · x402 · Creator Economy · Web3 · Airtime · Agent-Native
+
+## PoolParty on APIs.io
+
+Everything profiled for PoolParty is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/poolparty-io/](https://apis.io/providers/poolparty-io/)** — or go straight to one of the APIs or properties below.
+
+### APIs (3)
+
+- [PoolParty Main Stage Airtime MCP Server](https://apis.io/apis/poolparty-io/poolparty-mcp-server/) — Remote Model Context Protocol server (official registry name io.poolparty/main-stage-airtime) at https://www.poolparty.io/api/mcp — Streamable HTTP, POST…
+- [PoolParty Agent Concierge (A2A)](https://apis.io/apis/poolparty-io/poolparty-agent-concierge-a2a/) — Agent2Agent surface: an A2A 0.3.0 agent card served at https://www.poolparty.io/.well-known/agent-card.json (and byte-identically at the legacy…
+- [PoolParty Public Manifest API](https://apis.io/apis/poolparty-io/poolparty-public-manifest-api/) — Unauthenticated, read-only JSON routes under https://www.poolparty.io/api that the provider names as the "source of truth" for agents: the agent manifest…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Poolparty Io Events](https://apis.io/asyncapis/poolparty-io/poolparty-io-events/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [poolparty-io-mcp.yml](https://apis.io/servers/poolparty-io/poolparty-io-mcp-yml/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Poolparty Io Agentic Access](https://apis.io/agentic-access/poolparty-io/poolparty-io-agentic-access/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Poolparty Io Authentication](https://apis.io/security/poolparty-io/poolparty-io-authentication/)
+- [Poolparty Io Domain Security](https://apis.io/security/poolparty-io/poolparty-io-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Poolparty Io Plans Pricing](https://apis.io/plans/poolparty-io/poolparty-io-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Poolparty Io Rate Limits](https://apis.io/rate-limits/poolparty-io/poolparty-io-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.poolparty.io/)
+- [Documentation](https://www.poolparty.io/agent)
+- [Getting started](https://www.poolparty.io/agent-quickstart)
+- [Pricing](https://www.poolparty.io/api/channels/main/airtime)
+- [Blog](https://www.poolparty.io/blog/)
+
+## API Evangelist rating
+
+**Kin Score 42.2** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 81.7 |
+| Contract quality | 39.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 26.3 |
+| Developer ergonomics | 50.0 |
+| Access clarity | 42.1 |
+
+**Agent readiness 40.9** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | derived (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 16.7** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/poolparty-io/](https://apis.io/providers/poolparty-io/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for PoolParty: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/poolparty-io/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
